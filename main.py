@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from scripts import news_scraper
 
 import sqlite3
 print("called")
@@ -126,6 +127,9 @@ class Ui_MainWindow(object):
         self.actionLock.setText(_translate("MainWindow", "Lock"))
 
     def loadData(self):
+        print("Begin scan")
+        news_scraper.scanner()
+        print("Scan complete")
         conn=sqlite3.connect("pcp.db")
         cur=conn.cursor()
         cur.execute("SELECT * FROM newsitems")
