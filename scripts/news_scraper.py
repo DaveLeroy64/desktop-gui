@@ -3,9 +3,13 @@ from bs4 import BeautifulSoup
 from html.parser import HTMLParser
 import sqlite3
 from sqlite3 import Error
+from tqdm import tqdm
 
 import sys
 import os
+
+import storage
+
 headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'}
 
 sites = ["https://www.bbc.co.uk/news", "https://news.sky.com/world", "https://www.ft.com/", "https://www.theguardian.com/world", "https://www.telegraph.co.uk/", "https://www.aljazeera.com/", "https://www.foxnews.com/world"]
@@ -17,12 +21,11 @@ sites = ["https://www.bbc.co.uk/news", "https://news.sky.com/world", "https://ww
 
 def scanner():
     headlines = []
-    print("=====")
     headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'}
 
 
-
-    for site in sites:
+    print("Scanning...\n")
+    for site in tqdm(sites):
         r = requests.get(site, headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
         c = r.content
         soup = BeautifulSoup(c, "html.parser")
@@ -42,8 +45,8 @@ def scanner():
             pagecontent = storypage.content
             storypagescanner = BeautifulSoup(pagecontent, "html.parser")
 
-            print(storylink)
-            print("=====")
+            # print(storylink)
+            # print("=====")
 
             try:
                 try: # if not the live blog
@@ -67,10 +70,10 @@ def scanner():
 
                 storypic = articletext1.select_one("img")['src']               
 
-            storyitem = {'Name': 'BBC', 'image': storypic, 'story': step3, 'storylink': storylink, 'slug': slugify(step3), 'body': articletext3}
+            storyitem = {'Name': 'BBC', 'image': storypic, 'story': step3, 'storylink': storylink, 'body': articletext3}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://news.sky.com/world":
             step1 = soup.select_one(".sdc-site-tile__headline")
@@ -93,10 +96,10 @@ def scanner():
             except:
                 articletext3 = 'None'
 
-            storyitem = {'Name': 'Sky', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': articletext3}
+            storyitem = {'Name': 'Sky', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'body': articletext3}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://www.ft.com/":
             this_headline = soup.select_one(".js-teaser-heading-link")
@@ -106,10 +109,10 @@ def scanner():
 
 
 
-            storyitem = {'Name': 'FT', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': 'None'}
+            storyitem = {'Name': 'FT', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'body': 'None'}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://www.theguardian.com/world":
             this_headline = soup.select_one(".js-headline-text")
@@ -139,10 +142,10 @@ def scanner():
 
 
 
-            storyitem = {'Name': 'The Guardian', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': articletext2}
+            storyitem = {'Name': 'The Guardian', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'body': articletext2}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://www.telegraph.co.uk/":
             this_headline = soup.select_one(".list-headline__link")
@@ -169,10 +172,10 @@ def scanner():
                 articletext3 = 'None'
 
 
-            storyitem = {'Name': 'The Telegraph', 'image': storypic, 'story': this_headline.get_text().replace("\n", " "), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': articletext3}
+            storyitem = {'Name': 'The Telegraph', 'image': storypic, 'story': this_headline.get_text().replace("\n", " "), 'storylink': storylink, 'body': articletext3}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://www.aljazeera.com/":
             # this_headline = soup.select_one(".queen-top-sec-title")
@@ -208,10 +211,10 @@ def scanner():
             except:
                 articletext3 = 'Non'
 
-            storyitem = {'Name': 'Al Jazeera', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': articletext3}
+            storyitem = {'Name': 'Al Jazeera', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'body': articletext3}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
         if site == "https://www.foxnews.com/world":
             step1 = soup.select_one(".info-header")
@@ -244,21 +247,22 @@ def scanner():
             except:
                 articletext3 = 'None'
 
-            storyitem = {'Name': 'FOX', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'slug': slugify(this_headline.get_text()), 'body': articletext3}
+            storyitem = {'Name': 'FOX', 'image': storypic, 'story': this_headline.get_text(), 'storylink': storylink, 'body': articletext3}
             headlines.append(storyitem)
-            print(storyitem['Name'])
-            print(storyitem['story'])
+            # print(storyitem['Name'])
+            # print(storyitem['story'])
 
-    print("================")
-    print("================")
 
     
 
 
+    storage.connect('newsitems')
 
     for source in headlines:
         print(source['Name'])
+        storage.insert(source, 'newsitems')
 
+scanner()
 
 # DJANGO DATABASE
     # if NewsItem.objects.count() < 7:
