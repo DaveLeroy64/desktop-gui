@@ -260,7 +260,7 @@ def scanner():
 
     for source in headlines:
         print(source['Name'])
-        storage.insert(source, 'newsitems')
+        storage.insert_newsitem(source, 'newsitems')
 
 # scanner()
 

@@ -10,11 +10,14 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import news_scraper
+from properties import Ui_PropertyWindow
 
 import sqlite3
 print("called")
 
 class Ui_MainWindow(object):
+
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("Python Control Panel")
         MainWindow.resize(826, 554)
@@ -82,14 +85,20 @@ class Ui_MainWindow(object):
         self.actionExit.setObjectName("actionExit")
         self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         self.actionNews_Scraper.setObjectName("actionNews_Scraper")
+
         self.actionProperty_Data = QtWidgets.QAction(MainWindow)
         self.actionProperty_Data.setObjectName("actionProperty_Data")
+        self.actionProperty_Data.triggered.connect(self.to_properties)
+
         self.actionPolscraper = QtWidgets.QAction(MainWindow)
         self.actionPolscraper.setObjectName("actionPolscraper")
+
         self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
         self.actionDarkSky_Weather.setObjectName("actionDarkSky_Weather")
+
         self.actionLocal_Information = QtWidgets.QAction(MainWindow)
         self.actionLocal_Information.setObjectName("actionLocal_Information")
+
         self.actionLock = QtWidgets.QAction(MainWindow)
         self.actionLock.setObjectName("actionLock")
 
@@ -125,6 +134,14 @@ class Ui_MainWindow(object):
         self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         self.actionLock.setText(_translate("MainWindow", "Lock"))
+
+    def to_properties(self, MainWindow):
+        # if password = correct
+        self.property_window=QtWidgets.QMainWindow()
+        self.ui = Ui_PropertyWindow()
+        self.ui.setupUi(self.property_window)
+        self.property_window.show()
+        # MainWindow.close()
 
     def loadData(self):
         print("Begin scan")

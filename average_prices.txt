@@ -1,0 +1,9 @@
+
+2020-07-16_0025_Average Price from OTM for properties within 1 miles of Penzance: £316460
+2020-07-16_0028_Average Price from OTM for properties within 1 miles of penzance: £316460
+2020-07-16_0031_Average Price from OTM for properties within 1 miles of penzance: £316460
+2020-07-16_0032_Average Price from OTM for properties within 1 miles of mullion: £510651
+2020-07-16_0037_Average Price from OTM for properties within 1 miles of mullion: £510651
+2020-07-16_0044_Average Price from Zoopla for properties within 1 miles of mullion: £510651
+2020-07-16_0046_Average Price from Zoopla for properties within 1 miles of mullion: £510651
+2020-07-16_0138_Average Price from Zoopla for properties within 1 miles of okehampton: £293767
