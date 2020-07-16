@@ -22,17 +22,18 @@ def connect_property(city):
 #==========NEWSITEMS==========
 
 def check_newsitem(source):
-    print("Checking..." + source['story'])
+    print("Checking..." + source['storylink'])
     conn=sqlite3.connect("./pcp.db")
     cur = conn.cursor()
 
-    cur.execute("SELECT * from newsitems WHERE Story=?", (source['story'],))
+    cur.execute("SELECT * from newsitems WHERE Name=?", (source['Name'],))
     result = cur.fetchall()
     # print(result)
     # print(result[0])
 
     if result:
-        print("story DOES exist...let's have a look at it")
+        # for loop here for r in result...?
+        print("Article from outlet DOES exist...let's have a look at it")
         print(result[0][4])
         print("new story")
         print(source['storylink'])
@@ -43,7 +44,7 @@ def check_newsitem(source):
 
             print(f"New story from {source['Name']} - archiving and replacing")
             connect('newsarchive')
-            insert_newsitem(source, 'newsarchive')
+            insert_newsitem(source, 'newsarchive', 'old') # is this where the recursion problem occurs...
             print("Archived")
             print("Deleting from current items...")
             cur.execute('DELETE FROM newsitems WHERE Link=?', (str(result[0][4]),))
@@ -79,35 +80,47 @@ def check_newsitem(source):
     print("Checking complete")
 
 
-def insert_newsitem(source, table):
-    print("\n===Inserting to DB===")
-    status = check_newsitem(source)
+def insert_newsitem(source, table, *args):
 
-    if status == 'first':
-        conn=sqlite3.connect("./pcp.db")
-        cur = conn.cursor()
-        cur.execute(f"INSERT INTO {table} VALUES (NULL, ?, ?, ?, ?, ?)", (source['Name'], source['image'], source['story'], source['storylink'], source['body']))
-        conn.commit()
-        conn.close()
-        print(f"===Inserted First Story from {source['Name']}===\n")
-        return "first"
+    if not args:
+        print("\n===Inserting to DB===")
+        status = check_newsitem(source)
+        print("NO ARGS")
+        if status == 'first':
+            conn=sqlite3.connect("./pcp.db")
+            cur = conn.cursor()
+            cur.execute(f"INSERT INTO {table} VALUES (NULL, ?, ?, ?, ?, ?)", (source['Name'], source['image'], source['story'], source['storylink'], source['body']))
+            conn.commit()
+            conn.close()
+            print(f"===Inserted First Story from {source['Name']}===\n")
+            return "first"
 
-    elif status == 'new':
-        conn=sqlite3.connect("./pcp.db")
-        cur = conn.cursor()
-        cur.execute(f"INSERT INTO {table} VALUES (NULL, ?, ?, ?, ?, ?)", (source['Name'], source['image'], source['story'], source['storylink'], source['body']))
-        conn.commit()
-        conn.close()
-        print(f"===Inserted new story from {source['Name']}===\n")
-        return "new"
+        elif status == 'new':
+            conn=sqlite3.connect("./pcp.db")
+            cur = conn.cursor()
+            cur.execute(f"INSERT INTO {table} VALUES (NULL, ?, ?, ?, ?, ?)", (source['Name'], source['image'], source['story'], source['storylink'], source['body']))
+            conn.commit()
+            conn.close()
+            print(f"===Inserted new story from {source['Name']}===\n")
+            return "new"
 
-    elif status == "test":
-        print("test status")
-        return "test"
+        elif status == "test":
+            print("test status")
+            return "test"
 
+        else:
+            print(f"===Entry already exists and is up to date for: {source['Name']}===\n")
+            return "existing"
     else:
-        print(f"===Entry already exists and is up to date for: {source['Name']}===\n")
-        return "existing"
+        print("YES WE HAVE ARGS" + args[0])
+        print("=====ARCHIVING=====")
+        conn=sqlite3.connect("./pcp.db")
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO {table} VALUES (NULL, ?, ?, ?, ?, ?)", (source['Name'], source['image'], source['story'], source['storylink'], source['body']))
+        conn.commit()
+        conn.close()
+        print(f"===Inserted ARCHIVED story from {source['Name']}===\n")
+        return "archived"
 
 
 #==========PROPERTIES==========

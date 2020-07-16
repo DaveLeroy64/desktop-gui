@@ -124,12 +124,12 @@ class LoginWindow(object):
         self.actionExit.setStatusTip(_translate("MainWindow", "Close the application"))
 
     def tomainmenu(self):
-        # if password = correct
-        self.main_menu=QtWidgets.QMainWindow()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self.main_menu)
-        self.main_menu.show()
-        MainWindow.close()
+        if self.passwordbox.text() == "correct":
+            self.main_menu=QtWidgets.QMainWindow()
+            self.ui = Ui_MainWindow()
+            self.ui.setupUi(self.main_menu)
+            self.main_menu.show()
+            MainWindow.close()
 
     def closeconfirm(self):
         cfm = QMessageBox()
