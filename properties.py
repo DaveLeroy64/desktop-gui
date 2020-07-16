@@ -37,12 +37,21 @@ class Ui_PropertyWindow(object):
         self.search_radius_label.setText("Search Radius: " + str(value))
 
     def scan(self):
+        self.scan_progress_bar.setProperty("value", 0)
+        step_increment = 100 / zoopla_scraper.scanner.nu
+        step = 0
+
         self.scan_results_label.setText("Scanning...")
         city = self.city_town_scan_input.text()
         radius = self.search_radius_slider.value()
+
         print("Scanning for new properties")
         print(str(city))
         print(str(radius))
+
+        self.scan_progress_bar.setProperty("value", step)
+        step = step + step_increment
+        self.scan_progress_bar.setProperty("value", step)
         results = zoopla_scraper.scanner(city, radius)
         print("scan complete")
         self.scan_results_label.setText(str(results))
@@ -58,7 +67,6 @@ class Ui_PropertyWindow(object):
             self.scan_results_label.setText(f"{city.upper()} not found in database")
         else:
             step_increment = (100 / len(properties))
-            # print(maxsteps)
             step = step + step_increment
             self.scan_results_label.setText(f"{city.upper()}: {len(properties)} properties found in database")
             self.property_title_2.setText(f"CITY: {city.upper()} - {len(properties)} PROPERTIES")

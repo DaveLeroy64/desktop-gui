@@ -33,3 +33,4 @@
 2020-07-16_1247_Average Price from Zoopla for properties within 40 miles of fort william: £283400
 2020-07-16_1247_Average Price from Zoopla for properties within 40 miles of fort william: £283400
 2020-07-16_1248_Average Price from Zoopla for properties within 20 miles of penzance: £345819
+2020-07-16_1706_Average Price from Zoopla for properties within 1 miles of totnes: £408659
