@@ -12,11 +12,24 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import zoopla_scraper
 from scripts import storage
 
+# from main import Ui_MainWindow
+import main
+import sys
+
+
 
 class Ui_PropertyWindow(object):
 
+    # def __init__(self):
+    #     app = QtWidgets.QApplication(sys.argv)
+    #     MainWindow = QtWidgets.QMainWindow()
+    #     ui = Ui_PropertyWindow()
+    #     # ui.setupUi(MainWindow)
+    #     # MainWindow.show()
+    #     # sys.exit(app.exec_())
 
-    def populate_table(city):
+
+    def populate_table(self, city):
         print("put the city in the table widget")
 
     def slider_value(self):
@@ -24,6 +37,7 @@ class Ui_PropertyWindow(object):
         self.search_radius_label.setText("Search Radius: " + str(value))
 
     def scan(self):
+        self.scan_results_label.setText("Scanning...")
         city = self.city_town_scan_input.text()
         radius = self.search_radius_slider.value()
         print("Scanning for new properties")
@@ -34,38 +48,32 @@ class Ui_PropertyWindow(object):
         self.scan_results_label.setText(str(results))
 
     def search(self):
+        self.scan_progress_bar.setProperty("value", 0)
         city = self.db_search_input.text()
+        step = 10
         print(f"Fetching {city} from DB")
         properties = storage.view_properties(city)
         if properties == 'not found':
+            step=100
             self.scan_results_label.setText(f"{city.upper()} not found in database")
         else:
-            self.scan_results_label.setText(f"{city.upper()}: {len(properties)} properties found\nin database")
+            step_increment = (100 / len(properties))
+            # print(maxsteps)
+            step = step + step_increment
+            self.scan_results_label.setText(f"{city.upper()}: {len(properties)} properties found in database")
+            self.property_title_2.setText(f"CITY: {city.upper()} - {len(properties)} PROPERTIES")
             for p in properties:
                 print(p)
                 print(f"adding {p[3]} to table")
                 self.addTableRow(self.property_table, p)
+                step = step + step_increment
+                self.scan_progress_bar.setProperty("value", step)
 
-    # def addTableRow(self, table, rowData):   
-    #     print(table)     
-    #     print(type(rowData[0]))
-    #     row = table.rowCount()
-    #     table.setRowCount(row+1)
-    #     col = 0
-    #     i = 0
-    #     for item in rowData[i]:
-    #         print(rowData[i])
-    #         for attribute in rowData[i]:
-    #             print(attribute)
-    #             cell = QtWidgets.QTableWidgetItem(str(attribute))
-    #             table.setItem(row, col, cell)
-    #         i+=1
-    #         col += 1
     def addTableRow(self, table, row_data):
         row = table.rowCount()
         table.setRowCount(row+1)
         col = 0
-        for item in row_data:
+        for item in row_data[1:]: # exclude ID, no need to display
             cell = QtWidgets.QTableWidgetItem(str(item))
             table.setItem(row, col, cell)
             col += 1
@@ -75,7 +83,7 @@ class Ui_PropertyWindow(object):
 
 
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
+        MainWindow.setObjectName("Property Data Collector")
         MainWindow.resize(826, 554)
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -101,10 +109,10 @@ class Ui_PropertyWindow(object):
         self.property_table.setToolTipDuration(0)
         self.property_table.setShowGrid(True)
         self.property_table.setRowCount(0)
-        self.property_table.setColumnCount(11)
+        self.property_table.setColumnCount(10)
         self.property_table.setObjectName("property_table")
-        self.property_table.setHorizontalHeaderLabels(["ID","Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at"])
-        self.property_table.resizeColumnsToContents()
+        self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at"])
+        # self.property_table.resizeColumnsToContents()
 
 
         self.db_search_input = QtWidgets.QLineEdit(self.centralwidget)
@@ -178,7 +186,7 @@ class Ui_PropertyWindow(object):
         self.scan_progress_bar.setObjectName("scan_progress_bar")
 
         self.property_title_2 = QtWidgets.QLabel(self.centralwidget)
-        self.property_title_2.setGeometry(QtCore.QRect(-90, 0, 251, 41))
+        self.property_title_2.setGeometry(QtCore.QRect(0, 0, 251, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -209,8 +217,14 @@ class Ui_PropertyWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.actionMain = QtWidgets.QAction(MainWindow)
+        self.actionMain.setObjectName("actionMain")
+        self.actionMain.triggered.connect(self.toMainMenu)
+
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+
         self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         self.actionNews_Scraper.setObjectName("actionNews_Scraper")
         self.actionProperty_Data = QtWidgets.QAction(MainWindow)
@@ -223,6 +237,7 @@ class Ui_PropertyWindow(object):
         self.actionLocal_Information.setObjectName("actionLocal_Information")
         self.actionLock = QtWidgets.QAction(MainWindow)
         self.actionLock.setObjectName("actionLock")
+        self.menuMenu.addAction(self.actionMain)
         self.menuMenu.addAction(self.actionExit)
         self.menuPrograms.addAction(self.actionNews_Scraper)
         self.menuPrograms.addAction(self.actionProperty_Data)
@@ -240,7 +255,7 @@ class Ui_PropertyWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Property Data Collector"))
         self.property_title.setText(_translate("MainWindow", "PROPERTY DATA"))
         self.db_search_button.setText(_translate("MainWindow", "Search"))
         self.db_search_label.setText(_translate("MainWindow", "Search the DB for a city"))
@@ -254,6 +269,7 @@ class Ui_PropertyWindow(object):
         self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
         self.menuAPI.setTitle(_translate("MainWindow", "API"))
         self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
+        self.actionMain.setText(_translate("MainWindow", "Main Menu"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
         self.actionProperty_Data.setText(_translate("MainWindow", "Property Data"))
@@ -262,12 +278,24 @@ class Ui_PropertyWindow(object):
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         self.actionLock.setText(_translate("MainWindow", "Lock"))
 
+    def toMainMenu(self):
+        print("to main menu")
+        self.main_menu=QtWidgets.QMainWindow()
+        self.ui = main.Ui_MainWindow()
+        self.ui.setupUi(self.main_menu)
+        MainWindow.destroy()
+        self.main_menu.show()
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_PropertyWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_PropertyWindow()
+ui.setupUi(MainWindow)
+
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_PropertyWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

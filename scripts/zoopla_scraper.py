@@ -46,9 +46,14 @@ def scanner(city, radius):
 
 
     for page in soup.find_all("div", {"class":"paginate bg-muted"}):
+        print("trying to find pages")
         numpages = page.find_all("a")[-2].text
 
-    print(str(numpages) + " pages of results...\n")
+    try:
+        print(str(numpages) + " pages of results...\n")
+    except:
+        print("1 page of results")
+        numpages = 1
 
 
     if len(all) < 1:
@@ -149,4 +154,6 @@ def scanner(city, radius):
 
         print("Saved to DB")
         sendback = f"{properties_saved} properties within {radius}m\nAverage Price: £{round(avprice, 2)}"
+        if properties_existing > 0:
+            sendback += f"\n{properties_existing} already stored"
         return sendback

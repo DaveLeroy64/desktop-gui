@@ -119,7 +119,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Python Control Panel"))
         self.news_label.setText(_translate("MainWindow", "RECENT NEWS"))
         self.weather_label.setText(_translate("MainWindow", "WEATHER"))
         self.view_news_button.setText(_translate("MainWindow", "View"))
@@ -140,6 +140,8 @@ class Ui_MainWindow(object):
         self.property_window=QtWidgets.QMainWindow()
         self.ui = Ui_PropertyWindow()
         self.ui.setupUi(self.property_window)
+        MainWindow = QtWidgets.QMainWindow()
+        MainWindow.close()
         self.property_window.show()
         # MainWindow.close()
 

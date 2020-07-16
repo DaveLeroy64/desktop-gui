@@ -58,6 +58,7 @@ class LoginWindow(object):
         self.passwordbox = QtWidgets.QLineEdit(self.centralwidget)
         self.passwordbox.setGeometry(QtCore.QRect(130, 230, 201, 31))
         self.passwordbox.setObjectName("passwordbox")
+        self.passwordbox.setEchoMode(QtWidgets.QLineEdit.Password)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
