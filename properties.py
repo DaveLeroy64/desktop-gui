@@ -25,6 +25,7 @@ from scripts import storage
 # from main import Ui_MainWindow
 import main
 import sys
+import time
 
 
 
@@ -81,8 +82,11 @@ class Ui_PropertyWindow(object):
         results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
 
         self.scan_results_label.setText(str(results))
+        time.sleep(1)
+        self.scan_progress_bar.setProperty("value", 0)
 
     def search(self):
+        # wondering why event loop error? because it asks for user input i think
         self.property_table.setRowCount(0)
         self.scan_progress_bar.setProperty("value", 0)
         city = self.db_search_input.text()
@@ -103,6 +107,8 @@ class Ui_PropertyWindow(object):
                 self.addTableRow(self.property_table, p)
                 step = step + step_increment
                 self.scan_progress_bar.setProperty("value", step)
+        time.sleep(1)
+        self.scan_progress_bar.setProperty("value", 0)
 
     def addTableRow(self, table, row_data):
         row = table.rowCount()

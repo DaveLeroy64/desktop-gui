@@ -14,19 +14,17 @@ from datetime import datetime
 
 from . import storage
 
-# print("\nProperty data scraper. UK cities only.\n")
-
-# city = input("Enter city name: ")
-# radius = input("Enter geographic search radius (maximum 40): ")
-
-# accepted_radii = [1, 3, 5, 10, 15, 20, 30, 40]
-
-# if int(radius) not in accepted_radii:
-#     print("Radius must be 40 or less")
-#     print("Enter one of the following: 1, 3, 5, 10, 15, 20, 30, 40")
-#     radius = input("Re-enter search radius: ") 
-
 numpages = 1
+# idea for connecting to progress bar
+
+# one function here that calculates the number of pages
+# this data is passed to properties.py which then does a loop
+# over every page, that calls the PAGE SCAN function contained in HERE,
+# that scrapes the properties off THAT page
+
+# since the over 50 pages prompt crashes Qt, we can then pass that prompt to a
+# popupbox that is prompted if the return from the pages calc function is over 50
+# the OK button can then continue the scan, or cancel can abort it
 
 def scanner(city, radius):
     global numpages
@@ -69,13 +67,13 @@ def scanner(city, radius):
     base_url=f"https://www.zoopla.co.uk/for-sale/houses/{city}/?identifier={city}&page_size=100&property_type=houses&q={city}&search_source=refine&radius={radius}&pn="
     chars="qwertyuiopasdfghjklzxcvbnm,"
 
-    if int(numpages) > 50:
-        cont = input("Over 50 pages of results. Are you sure you wish to continue? y/n: ")
-        if "y" in cont:
-            pass
-        else:
-            print("Program terminated")
-            exit()
+    # if int(numpages) > 50:
+    #     cont = input("Over 50 pages of results. Are you sure you wish to continue? y/n: ")
+    #     if "y" in cont:
+    #         pass
+    #     else:
+    #         print("Program terminated")
+    #         exit()
 
     print("\nScanning " + str(numpages) + " pages...\n")
 

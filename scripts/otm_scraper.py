@@ -49,13 +49,13 @@ def scanner(city, radius):
         print("1 page of results")
         numpages = 1
 
-    if int(numpages) > 50:
-        cont = input("Over 50 pages of results. Are you sure you wish to continue? y/n\n")
-        if "y" in cont:
-            pass
-        else:
-            print("Program terminated")
-            exit()
+    # if int(numpages) > 50:
+    #     cont = input("Over 50 pages of results. Are you sure you wish to continue? y/n\n")
+    #     if "y" in cont:
+    #         pass
+    #     else:
+    #         print("Program terminated")
+    #         exit()
 
     for page in range(0, int(numpages)+1, 1):
         r = requests.get(f"https://www.onthemarket.com/for-sale/property/{city}/?page=" + str(page) + "&?radius={radius}", headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
