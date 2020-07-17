@@ -13,9 +13,19 @@ from scripts import news_scraper
 from properties import Ui_PropertyWindow
 
 import sqlite3
-print("called")
+import webbrowser
+from scripts import storage
 
 class Ui_MainWindow(object):
+
+    def open_news_link(self, story):
+        # webbrowser.open(link)
+        storage.browser_story(story)
+
+    def open_story(self, story):
+        # storage.browser_story(story)
+        print("Opening " + story.text())
+        storage.browser_story(story.text())
 
 
     def setupUi(self, MainWindow):
@@ -28,6 +38,7 @@ class Ui_MainWindow(object):
         self.news_list_view.setGeometry(QtCore.QRect(0, 50, 256, 431))
         self.news_list_view.setObjectName("news_list_view")
         self.news_list_view.setWordWrap(True)
+        self.news_list_view.itemDoubleClicked.connect(self.open_story)
         # self.news_list_view.setText("Fetching news...")
 
         self.weather_text_browser = QtWidgets.QTextBrowser(self.centralwidget)
@@ -144,6 +155,7 @@ class Ui_MainWindow(object):
         MainWindow.close()
         self.property_window.show()
         # MainWindow.close()
+    
 
     def loadData(self):
         print("Begin scan")
@@ -155,8 +167,9 @@ class Ui_MainWindow(object):
         result = cur.fetchall()
         for r in result:
             r[3].replace("\n", "")
-            newsitem = str(r[1]) + "\n" + str(r[3] + "\n---------------------------------------------")
+            newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
             self.news_list_view.addItem(newsitem)
+        
 
 
 

@@ -34,3 +34,11 @@
 2020-07-16_1247_Average Price from Zoopla for properties within 40 miles of fort william: £283400
 2020-07-16_1248_Average Price from Zoopla for properties within 20 miles of penzance: £345819
 2020-07-16_1706_Average Price from Zoopla for properties within 1 miles of totnes: £408659
+2020-07-17_1322_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1324_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1325_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1329_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1333_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1334_Average Price from Zoopla for properties within 1 miles of thurso: £131789
+2020-07-17_1337_Average Price from Zoopla for properties within 10 miles of thurso: £131216
+2020-07-17_1338_Average Price from OTM for properties within 10 miles of thurso: £127000

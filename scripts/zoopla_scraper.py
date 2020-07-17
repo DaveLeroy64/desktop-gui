@@ -26,11 +26,14 @@ from . import storage
 #     print("Enter one of the following: 1, 3, 5, 10, 15, 20, 30, 40")
 #     radius = input("Re-enter search radius: ") 
 
+numpages = 1
+
 def scanner(city, radius):
+    global numpages
     accepted_radii = [1, 3, 5, 10, 15, 20, 30, 40]
 
     if int(radius) not in accepted_radii:
-        return "Please enter a search radius of\n1, 3, 5, 10, 15, 20 or 30 miles"
+        return "Please enter a search radius of\n1, 3, 5, 10, 15, 20, 30 or 40 miles"
 
 
     search_time = datetime.now().strftime("%Y-%m-%d_%H%M")
@@ -48,6 +51,8 @@ def scanner(city, radius):
     for page in soup.find_all("div", {"class":"paginate bg-muted"}):
         print("trying to find pages")
         numpages = page.find_all("a")[-2].text
+        print(numpages)
+        print("++++++++++++++")
 
     try:
         print(str(numpages) + " pages of results...\n")
@@ -127,33 +132,34 @@ def scanner(city, radius):
         df = pandas.DataFrame(proplist)
 
         try:
-            avprice = np.asarray(df["Price"], dtype=np.int).mean()
+            zoo_avprice = np.asarray(df["Price"], dtype=np.int).mean()
             print("Average Price: ")
-            print(avprice)
+            print(zoo_avprice)
             print("Properties with price not explicitly specified excluded from average")
 
-            with open("average_prices.txt", 'a') as file:
-                file.write(f"\n{search_time}_Average Price from Zoopla for properties within {radius} miles of {city}: " + "£" + str(int(avprice)))
+            # with open("average_prices.txt", 'a') as file:
+            #     file.write(f"\n{search_time}_Average Price from Zoopla for properties within {radius} miles of {city}: " + "£" + str(int(avprice)))
         
         except:
             print("Cannot calculate average")
+            zoo_avprice = 0
 
         
         print(f"Saving {len(proplist)} properties to {city.upper()} database...")
         storage.connect_property(city)
 
-        properties_saved = 0
-        properties_existing = 0
+        zoo_properties_saved = 0
+        zoo_properties_existing = 0
 
         for p in proplist: # consider adding tqdm - and removing print statements in storage
             if storage.insert_property(city, p['Date_Listed'], p['Price'], p['Address'], p['Beds'], p['Bathrooms'], p['Reception_rooms'], p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time']) == 'new':
-                properties_saved += 1
+                zoo_properties_saved += 1
             else:
-                properties_existing += 1
-            print(f"Saved {properties_saved} to {city} - {properties_existing} already in database")
+                zoo_properties_existing += 1
+            print(f"Saved {zoo_properties_saved} to {city} - {zoo_properties_existing} already in database")
 
         print("Saved to DB")
-        sendback = f"{properties_saved} properties within {radius}m\nAverage Price: £{round(avprice, 2)}"
-        if properties_existing > 0:
-            sendback += f"\n{properties_existing} already stored"
-        return sendback
+        sendback = f"{zoo_properties_saved} properties within {radius}m\nAverage Price: £{round(zoo_avprice, 2)}"
+        if zoo_properties_existing > 0:
+            sendback += f"\n{zoo_properties_existing} already stored"
+        return zoo_properties_saved, zoo_properties_existing, int(zoo_avprice)

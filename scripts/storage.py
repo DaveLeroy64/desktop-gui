@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, webbrowser
 
 def connect(table):
     conn = sqlite3.connect("./pcp.db")
@@ -7,7 +7,8 @@ def connect(table):
     conn.commit()
     conn.close()
 def connect_property(city):
-    city = city.replace(" ", "_")
+    if " " in str(city):
+        city = city.replace(" ", "_")
     print("connect property")
     conn = sqlite3.connect("./pcp.db")
     cur = conn.cursor()
@@ -122,6 +123,20 @@ def insert_newsitem(source, table, *args):
         print(f"===Inserted ARCHIVED story from {source['Name']}===\n")
         return "archived"
 
+def browser_story(story):
+    outletname = story.split(":")
+    outletname = str(outletname[0])
+    print("Storage file - opening story from " + outletname)
+    conn=sqlite3.connect("./pcp.db")
+    cur = conn.cursor()
+
+    cur.execute("SELECT * from newsitems WHERE Name=?", (outletname,))
+    result = cur.fetchall()
+    link = result[0][4]
+    print("Opening: " + str(link))
+    webbrowser.open(link)
+
+
 
 #==========PROPERTIES==========
 
@@ -133,7 +148,8 @@ def check_property(city, address):
     print(f"\nENTRY CHECK - Searching tables for: {address}")
     for tablerow in cur.fetchall():
         table = tablerow[0]
-        if table != 'newsitems':
+        if table != 'newsitems' and table != 'newsarchive':
+            # print("searching table: " + str(table))
             cur.execute(f"SELECT * FROM {table} WHERE address=?", (address,))
             result = cur.fetchall()
             if result:
