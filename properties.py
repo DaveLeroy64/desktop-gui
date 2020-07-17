@@ -15,6 +15,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from datetime import datetime
 from scripts import zoopla_scraper, otm_scraper
 from scripts import storage
 
@@ -69,6 +70,10 @@ class Ui_PropertyWindow(object):
 
         print(zoo_avprice)
         print(otm_avprice)
+
+        print("Now storing to averages database...")
+        datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
+        storage.store_property_data(city, av_avprice, datecollected)
 
         results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
 

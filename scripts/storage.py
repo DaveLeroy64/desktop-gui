@@ -148,7 +148,7 @@ def check_property(city, address):
     print(f"\nENTRY CHECK - Searching tables for: {address}")
     for tablerow in cur.fetchall():
         table = tablerow[0]
-        if table != 'newsitems' and table != 'newsarchive':
+        if table != 'newsitems' and table != 'newsarchive' and ('property_data' not in table):
             # print("searching table: " + str(table))
             cur.execute(f"SELECT * FROM {table} WHERE address=?", (address,))
             result = cur.fetchall()
@@ -178,6 +178,23 @@ def insert_property(city, date_listed, price, address, beds, bathrooms, receptio
         # print(f"Entry already exists for: {address}")
         print("not saved")
         return "existing"
+
+def store_property_data(city, avprice, datecollected, *args):
+    city = city.replace(" ", "_")
+    conn=sqlite3.connect("./pcp.db")
+    cur = conn.cursor()
+    cur.execute(f"CREATE TABLE IF NOT EXISTS {city}_property_data (id INTEGER PRIMARY KEY, date_collected text, average_price text)")
+    if not args:
+        print("no additional data")
+        cur.execute(f"INSERT INTO {city}_property_data VALUES (NULL, ?, ?)", (datecollected, avprice))
+        print(f"data stored for {city}")
+    else:
+        print("additional data" + str(args))
+        cur.execute(f"INSERT INTO {city}_property_data VALUES (NULL, ?, ?)", (datecollected, avprice))
+
+    conn.commit()
+    conn.close()
+
 
 def view_properties(city):    
     conn=sqlite3.connect("./pcp.db")
