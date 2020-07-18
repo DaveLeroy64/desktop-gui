@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'property_avprice_table.ui'
+# Form implementation generated from reading ui file 'property_avprice_graph.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.0
 #
@@ -9,97 +9,110 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from pyqtgraph import PlotWidget, plot, DateAxisItem
+import pyqtgraph as pg
+import sys, os
 from scripts import storage
+from datetime import datetime
 
+class TimeAxisItem(pg.AxisItem):
+    def tickStrings(self, values, scale, spacing):
+        return [datetime.fromtimestamp(value) for value in values]
 
 class Ui_MainWindow(object):
 
-    def toMainMenu(self):
-        print("to main menu")
-        self.main_menu=QtWidgets.QMainWindow()
-        self.ui = main.Ui_MainWindow()
-        self.ui.setupUi(self.main_menu)
-        MainWindow.destroy()
-        self.main_menu.show()
-
-    def populate_table(self):        
-        self.data_table.setRowCount(0)
-        # self.scan_progress_bar.setProperty("value", 0)
-        city = self.citylist.currentText()
-        # step = 10
-        print(f"Fetching {city} from DB")
-        # properties = storage.view_properties(city)
-        data = storage.view_property_data(city)
-        print(data)
-        if data == 'not found':
-            step=100
-            self.title.setText(f"{city.upper()} data not in in database")
-        else:
-            self.title.setText(f"Property Trend Data: {city.upper()}")
-            # row = self.data_table.rowCount()
-            # self.data_table.setRowCount(row+1)
-            col = 0
-            for tuple_object in data:
-                self.addTableRow(self.data_table, tuple_object)
-
-    def addTableRow(self, table, row_data):
-        row = table.rowCount()
-        table.setRowCount(row+1)
-        col = 0
-        for item in row_data[1:]: # exclude ID, no need to display
-            cell = QtWidgets.QTableWidgetItem(str(item))
-            table.setItem(row, col, cell)
-            col += 1
-    
     def get_cities(self):
         return storage.get_all_cities()
 
+    def populate_graph(self):        
+        city = self.citylist.currentText()
+        print(f"Fetching {city} from DB")
+
+        data = storage.view_property_data(city)
+        if data == 'not found':
+            step=100
+            self.title.setText(f"{city.upper()} data not in in database")
+            self.graph.clear()
+
+        else:
+            self.graph.clear()
+            print(data)
+
+            dates = []
+            avprices = []
+            numbeds = []
+
+            
+            for entry in data:
+                # date = entry[1]
+                date = datetime.strptime(entry[1], "%Y-%m-%d_%H:%M")
+                # date = QtCore.QTime
+                # date = entry[1].replace("-", "")
+                # date = date.replace("_", "")
+                # date = date.replace(":", "")
+                dates.append(date.timestamp())
+                avprices.append(float(entry[2]))
+                numbeds.append(float(entry[3]))
+            print("graphdata")
+            print(dates)
+            print(avprices)
+            print(numbeds)
+
+
+            self.title.setText(f"{city.upper()} ask price trend")
+            pen = pg.mkPen(width=2)
+            self.graph.plot([d for d in dates], avprices, pen=pen, symbol="+", symbolSize = 15)
+            # axisItems = {'bottom': date_axis}, 
 
 
 
     def setupUi(self, MainWindow):
-
-        MainWindow.setObjectName("Mean Data Tables")
+        MainWindow.setObjectName("MainWindow")
         MainWindow.resize(826, 554)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
+        # self.change_me_to_plot = QtWidgets.QListWidget(self.centralwidget)
+        # self.change_me_to_plot.setGeometry(QtCore.QRect(0, 40, 611, 451))
+        # self.change_me_to_plot.setObjectName("change_me_to_plot")
+
+        self.date_axis = TimeAxisItem(orientation="bottom")
+        self.graph = pg.PlotWidget(self.centralwidget, axisItems = {'bottom': self.date_axis})
+        self.graph.setGeometry(QtCore.QRect(0, 40, 611, 451))
+        self.graph.setObjectName("Price Trend")
+        self.graph.setLabel("left", "Average Ask Price")
+        self.graph.setLabel("bottom", "Date")
+        self.graph.showGrid(x=True, y=True)
+
         cities = self.get_cities()
         self.citylist = QtWidgets.QComboBox(self.centralwidget)
-        self.citylist.setGeometry(QtCore.QRect(560, 60, 181, 31))
+        self.citylist.setGeometry(QtCore.QRect(630, 60, 181, 31))
         self.citylist.setObjectName("citylist")
         for city in cities:
             self.citylist.addItem(city)
-        self.citylist.activated.connect(self.populate_table)
+        self.citylist.activated.connect(self.populate_graph)
 
-        self.city_select = QtWidgets.QLabel(self.centralwidget)
-        self.city_select.setGeometry(QtCore.QRect(560, 30, 181, 31))
+        self.citylabel = QtWidgets.QLabel(self.centralwidget)
+        self.citylabel.setGeometry(QtCore.QRect(630, 30, 181, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.city_select.setFont(font)
-        self.city_select.setAlignment(QtCore.Qt.AlignCenter)
-        self.city_select.setObjectName("city_select")
+        self.citylabel.setFont(font)
+        self.citylabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.citylabel.setObjectName("citylabel")
 
-        self.graph_button = QtWidgets.QPushButton(self.centralwidget)
-        self.graph_button.setGeometry(QtCore.QRect(600, 120, 101, 31))
-        self.graph_button.setObjectName("graph_button")
+        self.table_button = QtWidgets.QPushButton(self.centralwidget)
+        self.table_button.setGeometry(QtCore.QRect(670, 110, 101, 31))
+        self.table_button.setObjectName("table_button")
 
         self.title = QtWidgets.QLabel(self.centralwidget)
-        self.title.setGeometry(QtCore.QRect(50, 10, 360, 21))
+        self.title.setGeometry(QtCore.QRect(140, 10, 251, 21))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.title.setFont(font)
+        self.title.setAlignment(QtCore.Qt.AlignCenter)
         self.title.setObjectName("title")
-
-        self.data_table = QtWidgets.QTableWidget(self.centralwidget)
-        self.data_table.setGeometry(QtCore.QRect(0, 40, 461, 470))
-        self.data_table.setObjectName("data_table")
-        self.data_table.setColumnCount(4)
-        self.data_table.setRowCount(0)
-        self.data_table.setShowGrid(True)
-        self.data_table.setHorizontalHeaderLabels(["Date Collected","Average Price","Average Bedrooms","Listings scanned"])
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -114,16 +127,21 @@ class Ui_MainWindow(object):
 
         self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
         self.menuProperty_Data.setObjectName("menuProperty_Data")
+
         # self.menuAPI = QtWidgets.QMenu(self.menubar)
         # self.menuAPI.setObjectName("menuAPI")
+
         # self.menuComputer = QtWidgets.QMenu(self.menubar)
         # self.menuComputer.setObjectName("menuComputer")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+
         # self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         # self.actionNews_Scraper.setObjectName("actionNews_Scraper")
         # self.actionPolscraper = QtWidgets.QAction(MainWindow)
@@ -134,15 +152,17 @@ class Ui_MainWindow(object):
         # self.actionLocal_Information.setObjectName("actionLocal_Information")
         # self.actionLock = QtWidgets.QAction(MainWindow)
         # self.actionLock.setObjectName("actionLock")
-        self.actionPrice_Data = QtWidgets.QAction(MainWindow)
-        self.actionPrice_Data.setObjectName("actionPrice_Data")
+
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
         self.actionPrice_Display.setObjectName("actionPrice_Display")
+        self.actionPrice_Data = QtWidgets.QAction(MainWindow)
+        self.actionPrice_Data.setObjectName("actionPrice_Data")
+
         self.menuMenu.addAction(self.actionExit)
-        # self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
-        self.menuPrograms.addAction(self.actionPrice_Data)
         self.menuPrograms.addAction(self.actionPrice_Display)
+        self.menuPrograms.addAction(self.actionPrice_Data)
         # self.menuPrograms.addAction(self.actionNews_Scraper)
+        # self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
         # self.menuPrograms.addAction(self.actionPolscraper)
         # self.menuAPI.addAction(self.actionDarkSky_Weather)
         # self.menuAPI.addAction(self.actionLocal_Information)
@@ -157,13 +177,12 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Mean Data Tables"))
-        self.city_select.setText(_translate("MainWindow", "Select City"))
-        self.graph_button.setText(_translate("MainWindow", "View Graph"))
-        self.title.setText(_translate("MainWindow", "Property Trend Data - No City"))
-
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.citylabel.setText(_translate("MainWindow", "Select City"))
+        self.table_button.setText(_translate("MainWindow", "View Table"))
+        self.title.setText(_translate("MainWindow", "Property Trend Data"))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
-        self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
+        self.menuPrograms.setTitle(_translate("MainWindow", "Property"))
         # self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
         # self.menuAPI.setTitle(_translate("MainWindow", "API"))
         # self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
@@ -173,8 +192,8 @@ class Ui_MainWindow(object):
         # self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         # self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         # self.actionLock.setText(_translate("MainWindow", "Lock"))
-        self.actionPrice_Data.setText(_translate("MainWindow", "Property Main"))
-        self.actionPrice_Display.setText(_translate("MainWindow", "Price Display"))
+        self.actionPrice_Display.setText(_translate("MainWindow", "Property Main"))
+        self.actionPrice_Data.setText(_translate("MainWindow", "Price Data"))
 
     
     def toMainMenu(self):
@@ -208,7 +227,6 @@ class Ui_MainWindow(object):
 
 
 if __name__ == "__main__":
-    print("we're in")
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()

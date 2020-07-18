@@ -15,7 +15,24 @@ headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko
 sites = ["https://www.bbc.co.uk/news", "https://news.sky.com/world", "https://www.ft.com/", "https://www.theguardian.com/world", "https://www.telegraph.co.uk/", "https://www.aljazeera.com/", "https://www.foxnews.com/world"]
 
 
+"""
+IDEAS
 
+On activation of main menu/whole program, dialog popupbox appears
+asking if you want to "activate scrapers"/property scrapers
+this then activates property scrapers on a 'default' interval
+(say once/twice a day) as defined by a default list - see below
+
+in scrapers main page, when clicking 'scan' to activate scrapers, also can
+select interval of how many times per day
+this then selects a list of times depending on how many times per day
+for example if times_per_day = 3 it selects a list called
+3_time_per_day = ["12:00", "06:00", "00:00"] and thenthe scanner function runs IF
+scan_time in interval - which is passed to it as an argument
+
+
+
+"""
 
         
 
@@ -224,7 +241,11 @@ def scanner():
             pic = soup.select_one(".story-1")
             storypic = pic.select_one("img")['src']
 
-            storylink = 'https://www.foxnews.com' + this_headline['href']
+            # storylink = 'https://www.foxnews.com' + this_headline['href']
+            # the above suddenly broke and added a whole new url at the end of foxnews.com/world
+            
+            storylink = this_headline['href']
+            print(storylink)
 
             storypage = requests.get(storylink, headers=headers)
             pagecontent = storypage.content

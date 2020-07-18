@@ -23,7 +23,7 @@ from scripts import zoopla_scraper, otm_scraper
 from scripts import storage
 
 # from main import Ui_MainWindow
-import main, prop_av_table
+import main, prop_av_table, prop_av_graph
 import sys
 import time
 
@@ -129,8 +129,8 @@ class Ui_PropertyWindow(object):
         print("row data")
         print(row_data)
         for item in row_data[1:]: # exclude ID, no need to display
-            print("item")
-            print(item)
+            # print("item")
+            # print(item)
             cell = QtWidgets.QTableWidgetItem(str(item))
             table.setItem(row, col, cell)
             col += 1
@@ -270,11 +270,13 @@ class Ui_PropertyWindow(object):
         self.menuPrograms.setObjectName("menuPrograms")
         self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
         self.menuProperty_Data.setObjectName("menuProperty_Data")
-        self.menuAPI = QtWidgets.QMenu(self.menubar)
-        self.menuAPI.setObjectName("menuAPI")
-        self.menuComputer = QtWidgets.QMenu(self.menubar)
-        self.menuComputer.setObjectName("menuComputer")
+
+        # self.menuAPI = QtWidgets.QMenu(self.menubar)
+        # self.menuAPI.setObjectName("menuAPI")
+        # self.menuComputer = QtWidgets.QMenu(self.menubar)
+        # self.menuComputer.setObjectName("menuComputer")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -286,22 +288,22 @@ class Ui_PropertyWindow(object):
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
 
-        self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
-        self.actionNews_Scraper.setObjectName("actionNews_Scraper")
-        self.actionPolscraper = QtWidgets.QAction(MainWindow)
-        self.actionPolscraper.setObjectName("actionPolscraper")
-        self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
-        self.actionDarkSky_Weather.setObjectName("actionDarkSky_Weather")
-        self.actionLocal_Information = QtWidgets.QAction(MainWindow)
-        self.actionLocal_Information.setObjectName("actionLocal_Information")
-        self.actionLock = QtWidgets.QAction(MainWindow)
-        self.actionLock.setObjectName("actionLock")
+        # self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
+        # self.actionNews_Scraper.setObjectName("actionNews_Scraper")
+        # self.actionPolscraper = QtWidgets.QAction(MainWindow)
+        # self.actionPolscraper.setObjectName("actionPolscraper")
+        # self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
+        # self.actionDarkSky_Weather.setObjectName("actionDarkSky_Weather")
+        # self.actionLocal_Information = QtWidgets.QAction(MainWindow)
+        # self.actionLocal_Information.setObjectName("actionLocal_Information")
+        # self.actionLock = QtWidgets.QAction(MainWindow)
+        # self.actionLock.setObjectName("actionLock")
 
-        self.actionProperty_Data = QtWidgets.QAction(MainWindow)
-        self.actionProperty_Data.setObjectName("actionProperty_Data")
+        # self.actionProperty_Data = QtWidgets.QAction(MainWindow)
+        # self.actionProperty_Data.setObjectName("actionProperty_Data")
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
         self.actionPrice_Display.setObjectName("actionPrice_Display")
-        # self.actionPrice_Display.triggered.connect(self.toPriceDisplay)
+        self.actionPrice_Display.triggered.connect(self.toPriceDisplay)
 
         self.actionPrice_Data = QtWidgets.QAction(MainWindow)
         self.actionPrice_Data.setObjectName("actionPrice_Data")
@@ -310,19 +312,21 @@ class Ui_PropertyWindow(object):
 
         self.menuMenu.addAction(self.actionMain)
         self.menuMenu.addAction(self.actionExit)
-        self.menuPrograms.addAction(self.actionNews_Scraper)
-        self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
-        self.menuProperty_Data.addAction(self.actionProperty_Data)
-        self.menuProperty_Data.addAction(self.actionPrice_Display)
-        self.menuProperty_Data.addAction(self.actionPrice_Data)
-        self.menuPrograms.addAction(self.actionPolscraper)
-        self.menuAPI.addAction(self.actionDarkSky_Weather)
-        self.menuAPI.addAction(self.actionLocal_Information)
-        self.menuComputer.addAction(self.actionLock)
+
+        # self.menuPrograms.addAction(self.actionNews_Scraper)
+
+        # self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
+        # self.menuProperty_Data.addAction(self.actionProperty_Data)
+        self.menuPrograms.addAction(self.actionPrice_Display)
+        self.menuPrograms.addAction(self.actionPrice_Data)
+        # self.menuPrograms.addAction(self.actionPolscraper)
+        # self.menuAPI.addAction(self.actionDarkSky_Weather)
+        # self.menuAPI.addAction(self.actionLocal_Information)
+        # self.menuComputer.addAction(self.actionLock)
         self.menubar.addAction(self.menuMenu.menuAction())
         self.menubar.addAction(self.menuPrograms.menuAction())
-        self.menubar.addAction(self.menuAPI.menuAction())
-        self.menubar.addAction(self.menuComputer.menuAction())
+        # self.menubar.addAction(self.menuAPI.menuAction())
+        # self.menubar.addAction(self.menuComputer.menuAction())
 
         
 
@@ -341,19 +345,26 @@ class Ui_PropertyWindow(object):
         self.scan_new_properties_button.setText(_translate("MainWindow", "Scan"))
         self.scan_progress_bar.setFormat(_translate("MainWindow", "%p%"))
         self.property_title_2.setText(_translate("MainWindow", "CITY: "))
+
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
-        self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
-        self.menuAPI.setTitle(_translate("MainWindow", "API"))
-        self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
+        self.menuPrograms.setTitle(_translate("MainWindow", "Property"))
+
+        # self.menuAPI.setTitle(_translate("MainWindow", "API"))
+        # self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
+
         self.actionMain.setText(_translate("MainWindow", "Main Menu"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
-        self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
+
+        # self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
+
         self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
-        self.actionPolscraper.setText(_translate("MainWindow", "Polscraper"))
-        self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
-        self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
-        self.actionLock.setText(_translate("MainWindow", "Lock"))
-        self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
+
+        # self.actionPolscraper.setText(_translate("MainWindow", "Polscraper"))
+        # self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
+        # self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
+        # self.actionLock.setText(_translate("MainWindow", "Lock"))
+
+        # self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
         self.actionPrice_Display.setText(_translate("MainWindow", "Price Display"))
         self.actionPrice_Data.setText(_translate("MainWindow", "Price Data"))
 
@@ -372,6 +383,13 @@ class Ui_PropertyWindow(object):
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
+    def toPriceDisplay(self):
+        print("to price data")
+        self.price_display=QtWidgets.QMainWindow()
+        self.ui = prop_av_graph.Ui_MainWindow()
+        self.ui.setupUi(self.price_display)
+        MainWindow.destroy()
+        self.price_display.show()
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
