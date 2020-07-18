@@ -30,6 +30,9 @@ for example if times_per_day = 3 it selects a list called
 3_time_per_day = ["12:00", "06:00", "00:00"] and thenthe scanner function runs IF
 scan_time in interval - which is passed to it as an argument
 
+MAKE SURE TO ADD THE SCRAPERS AS A SEPARATE THREAD SO YOU CAN STILL USE
+THE CONTROL PANEL!
+
 
 
 """
@@ -241,10 +244,10 @@ def scanner():
             pic = soup.select_one(".story-1")
             storypic = pic.select_one("img")['src']
 
-            # storylink = 'https://www.foxnews.com' + this_headline['href']
-            # the above suddenly broke and added a whole new url at the end of foxnews.com/world
-            
-            storylink = this_headline['href']
+            storylink = 'https://www.foxnews.com' + this_headline['href']
+            if "foxnews.com" not in storylink:
+                storylink = this_headline['href']
+
             print(storylink)
 
             storypage = requests.get(storylink, headers=headers)

@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
-import prop_av_table
+import prop_av_table, prop_av_graph
 
 import sqlite3
 import webbrowser
@@ -105,6 +105,7 @@ class Ui_MainWindow(object):
         self.actionProperty_Data.setObjectName("actionProperty_Data")
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
         self.actionPrice_Display.setObjectName("actionPrice_Display")
+        self.actionPrice_Display.triggered.connect(self.toPriceDisplay)
         self.actionPrice_Data = QtWidgets.QAction(MainWindow)
         self.actionPrice_Data.setObjectName("actionPrice_Data")
         self.actionProperty_Data.triggered.connect(self.to_properties)
@@ -179,6 +180,13 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
+    def toPriceDisplay(self):
+        print("to price data")
+        self.price_display=QtWidgets.QMainWindow()
+        self.ui = prop_av_graph.Ui_MainWindow()
+        self.ui.setupUi(self.price_display)
+        MainWindow.destroy()
+        self.price_display.show()
     
 
     def loadData(self):

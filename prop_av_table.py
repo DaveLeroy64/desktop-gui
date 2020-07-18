@@ -10,6 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import storage
+import prop_av_graph, properties
+import sys, os
 
 
 class Ui_MainWindow(object):
@@ -83,6 +85,7 @@ class Ui_MainWindow(object):
         self.graph_button = QtWidgets.QPushButton(self.centralwidget)
         self.graph_button.setGeometry(QtCore.QRect(600, 120, 101, 31))
         self.graph_button.setObjectName("graph_button")
+        self.graph_button.clicked.connect(self.toPriceDisplay)
 
         self.title = QtWidgets.QLabel(self.centralwidget)
         self.title.setGeometry(QtCore.QRect(50, 10, 360, 21))
@@ -135,9 +138,11 @@ class Ui_MainWindow(object):
         # self.actionLock = QtWidgets.QAction(MainWindow)
         # self.actionLock.setObjectName("actionLock")
         self.actionPrice_Data = QtWidgets.QAction(MainWindow)
-        self.actionPrice_Data.setObjectName("actionPrice_Data")
+        self.actionPrice_Data.setObjectName("actionPrice_Data") # this is actually "Property Main"
+        self.actionPrice_Data.triggered.connect(self.toPropertyMain)
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
         self.actionPrice_Display.setObjectName("actionPrice_Display")
+        self.actionPrice_Display.triggered.connect(self.toPriceDisplay)
         self.menuMenu.addAction(self.actionExit)
         # self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
         self.menuPrograms.addAction(self.actionPrice_Data)
@@ -163,7 +168,7 @@ class Ui_MainWindow(object):
         self.title.setText(_translate("MainWindow", "Property Trend Data - No City"))
 
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
-        self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
+        self.menuPrograms.setTitle(_translate("MainWindow", "Property"))
         # self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
         # self.menuAPI.setTitle(_translate("MainWindow", "API"))
         # self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
@@ -186,11 +191,11 @@ class Ui_MainWindow(object):
         self.main_menu.show()
     def toPropertyMain(self):
         print("to main menu")
-        self.main_menu=QtWidgets.QMainWindow()
-        self.ui = main.Ui_MainWindow()
-        self.ui.setupUi(self.main_menu)
+        self.property_main=QtWidgets.QMainWindow()
+        self.ui = properties.Ui_PropertyWindow()
+        self.ui.setupUi(self.property_main)
         MainWindow.destroy()
-        self.main_menu.show()
+        self.property_main.show()
     def toPriceData(self):
         print("to price data")
         self.price_data=QtWidgets.QMainWindow()
@@ -198,21 +203,33 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
+
+    # MAKE THIS FUNCTION PASS THE CITY CURRENTLY SELECTED TO THE
+    # DATA WINDOW TO DISPLAY ON LOADING AS WELL!
+    # MAYBE BY CALLING A FUNCTION IN THE PY FILE IN THIS FUNCTION HERE
     def toPriceDisplay(self):
+        current_city_signal = QtCore.pyqtSignal(str)
         print("to price data")
+        current_city = self.citylist.currentText() # this function pass to show in table
+        current_city_signal.emit(current_city)
         self.price_display=QtWidgets.QMainWindow()
         self.ui = prop_av_graph.Ui_MainWindow()
         self.ui.setupUi(self.price_display)
-        MainWindow.destroy()
+        # MainWindow.destroy()
         self.price_display.show()
+        print("current city: " + current_city)
+        prop_av_graph.city_from_table(current_city)
 
-
-if __name__ == "__main__":
-    print("we're in")
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+# if __name__ == "__main__":
+#     print("we're in")
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

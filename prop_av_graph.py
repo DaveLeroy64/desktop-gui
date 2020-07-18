@@ -19,13 +19,26 @@ class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
         return [datetime.fromtimestamp(value) for value in values]
 
+
+
 class Ui_MainWindow(object):
+
+    # def __init__(self):
+    #     self.prop trying to receive signal from table to get current city
+
+    def city_from_table(self, *args):
+        print("city: " + args[0])
+        self.populate_graph(args[0])
+        # would this work if i RETURN it instead...?
 
     def get_cities(self):
         return storage.get_all_cities()
 
-    def populate_graph(self):        
-        city = self.citylist.currentText()
+    def populate_graph(self, *args):
+        if not args:        
+            city = self.citylist.currentText()
+        else:
+            city = args[0]
         print(f"Fetching {city} from DB")
 
         data = storage.view_property_data(city)
@@ -177,7 +190,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Trend Graph"))
         self.citylabel.setText(_translate("MainWindow", "Select City"))
         self.table_button.setText(_translate("MainWindow", "View Table"))
         self.title.setText(_translate("MainWindow", "Property Trend Data"))
@@ -225,12 +238,15 @@ class Ui_MainWindow(object):
         MainWindow.destroy()
         self.price_display.show()
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

@@ -126,8 +126,8 @@ class Ui_PropertyWindow(object):
         row = table.rowCount()
         table.setRowCount(row+1)
         col = 0
-        print("row data")
-        print(row_data)
+        # print("row data")
+        # print(row_data)
         for item in row_data[1:]: # exclude ID, no need to display
             # print("item")
             # print(item)
@@ -335,7 +335,7 @@ class Ui_PropertyWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Property Data Collector"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Property Dashboard"))
         self.property_title.setText(_translate("MainWindow", "PROPERTY DATA"))
         self.db_search_button.setText(_translate("MainWindow", "Search"))
         self.db_search_label.setText(_translate("MainWindow", "Search the DB for a city"))
