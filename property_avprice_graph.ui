@@ -6,47 +6,75 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
-    <height>545</height>
+    <width>826</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="loginbutton">
+   <widget class="QListWidget" name="change_me_to_plot">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>340</y>
-      <width>111</width>
+      <x>0</x>
+      <y>40</y>
+      <width>611</width>
+      <height>451</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="citylist">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>60</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="citylabel">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>30</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Select City</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="table_button">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>110</y>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>LOGIN</string>
+     <string>View Table</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="closebutton">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>380</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>CLOSE</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="title">
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>60</y>
-      <width>171</width>
-      <height>51</height>
+      <y>10</y>
+      <width>251</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -57,49 +85,7 @@
      </font>
     </property>
     <property name="text">
-     <string>PYTHON CONTROL PANEL</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <property name="wordWrap">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>180</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>ENTER PASSWORD</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <property name="wordWrap">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>230</y>
-      <width>201</width>
-      <height>31</height>
-     </rect>
+     <string>Property Trend Data</string>
     </property>
    </widget>
   </widget>
@@ -108,7 +94,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>468</width>
+     <width>826</width>
      <height>21</height>
     </rect>
    </property>
@@ -122,16 +108,23 @@
     <property name="title">
      <string>Programs</string>
     </property>
-    <addaction name="actionNews_Scanner"/>
-    <addaction name="actionProperty_Datascraper"/>
+    <widget class="QMenu" name="menuProperty_Data">
+     <property name="title">
+      <string>Property Data</string>
+     </property>
+     <addaction name="actionPrice_Display"/>
+     <addaction name="actionPrice_Data"/>
+    </widget>
+    <addaction name="actionNews_Scraper"/>
+    <addaction name="menuProperty_Data"/>
     <addaction name="actionPolscraper"/>
    </widget>
-   <widget class="QMenu" name="menuAPIs">
+   <widget class="QMenu" name="menuAPI">
     <property name="title">
-     <string>APIs</string>
+     <string>API</string>
     </property>
     <addaction name="actionDarkSky_Weather"/>
-    <addaction name="actionLocal_Facilities"/>
+    <addaction name="actionLocal_Information"/>
    </widget>
    <widget class="QMenu" name="menuComputer">
     <property name="title">
@@ -141,39 +134,18 @@
    </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuPrograms"/>
-   <addaction name="menuAPIs"/>
+   <addaction name="menuAPI"/>
    <addaction name="menuComputer"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionLock">
+  <action name="actionExit">
    <property name="text">
-    <string>Lock</string>
-   </property>
-   <property name="statusTip">
-    <string>Lock this computer</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Exit</string>
    </property>
   </action>
-  <action name="actionDarkSky_Weather">
+  <action name="actionNews_Scraper">
    <property name="text">
-    <string>DarkSky Weather</string>
-   </property>
-  </action>
-  <action name="actionLocal_Facilities">
-   <property name="text">
-    <string>Local Facilities</string>
-   </property>
-  </action>
-  <action name="actionNews_Scanner">
-   <property name="text">
-    <string>News Scanner</string>
-   </property>
-  </action>
-  <action name="actionProperty_Datascraper">
-   <property name="text">
-    <string>Property Datascraper</string>
+    <string>News Scraper</string>
    </property>
   </action>
   <action name="actionPolscraper">
@@ -181,12 +153,29 @@
     <string>Polscraper</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="actionDarkSky_Weather">
    <property name="text">
-    <string>Exit</string>
+    <string>DarkSky Weather</string>
    </property>
-   <property name="statusTip">
-    <string>Close the application</string>
+  </action>
+  <action name="actionLocal_Information">
+   <property name="text">
+    <string>Local Information</string>
+   </property>
+  </action>
+  <action name="actionLock">
+   <property name="text">
+    <string>Lock</string>
+   </property>
+  </action>
+  <action name="actionPrice_Display">
+   <property name="text">
+    <string>Price Display</string>
+   </property>
+  </action>
+  <action name="actionPrice_Data">
+   <property name="text">
+    <string>Price Data</string>
    </property>
   </action>
  </widget>

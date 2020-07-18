@@ -64,20 +64,6 @@ def check_newsitem(source):
         print("First story")
         return 'first'
 
-    # elif result and (result[0][3] != source['story']):
-    #     print(f"New story from {source['Name']} - archiving and replacing")
-    #     connect('newsarchive')
-    #     insert_newsitem(source, 'newsarchive')
-    #     print("Archived")
-    #     print("Deleting from current items...")
-    #     cur.execute('DELETE FROM newsitems WHERE Story=?', (result[0][3],))
-    #     conn.commit()
-    #     conn.close()
-    #     print("Deleted")
-    #     return 'new'
-
-
-
     print("Checking complete")
 
 
@@ -179,18 +165,20 @@ def insert_property(city, date_listed, price, address, beds, bathrooms, receptio
         print("not saved")
         return "existing"
 
-def store_property_data(city, avprice, datecollected, *args):
+# def store_property_data(city, avprice, datecollected, numproperties, avbeds *args):
+def store_property_data(city, *args):
     city = city.replace(" ", "_")
     conn=sqlite3.connect("./pcp.db")
     cur = conn.cursor()
-    cur.execute(f"CREATE TABLE IF NOT EXISTS {city}_property_data (id INTEGER PRIMARY KEY, date_collected text, average_price text)")
-    if not args:
-        print("no additional data")
-        cur.execute(f"INSERT INTO {city}_property_data VALUES (NULL, ?, ?)", (datecollected, avprice))
-        print(f"data stored for {city}")
-    else:
-        print("additional data" + str(args))
-        cur.execute(f"INSERT INTO {city}_property_data VALUES (NULL, ?, ?)", (datecollected, avprice))
+    cur.execute(f"CREATE TABLE IF NOT EXISTS {city}_property_data (id INTEGER PRIMARY KEY, date_collected text, average_price text, average_bedrooms integer, Listings_scanned integer)")
+
+    print("additional data")
+    print(a for a in args)
+    print("additional data type")
+    print(type(a) for a in args)
+    print("done that")
+    cur.execute(f"INSERT INTO {city}_property_data VALUES (NULL, ?, ?, ?, ?)", (args[0], args[1], args[2], args[3]))
+    print(f"data stored for {city}")
 
     conn.commit()
     conn.close()
@@ -207,6 +195,37 @@ def view_properties(city):
         conn.close()
         print("found!!")
         return properties
+    except:
+        print("not found...")
+        return "not found"
+
+def get_all_cities():
+    conn=sqlite3.connect("./pcp.db")
+    cur=conn.cursor()
+    tables = []
+
+    cur.execute("SELECT name from sqlite_master WHERE type='table'")
+    for tablerow in cur.fetchall():
+        table = tablerow[0]
+        if table != 'newsitems' and table != 'newsarchive' and ('property_data' not in table):
+            tables.append(table)
+
+    conn.close()
+    return tables
+
+
+def view_property_data(city):    
+    print("view data for " + city)
+    conn=sqlite3.connect("./pcp.db")
+    cur=conn.cursor()
+    if " " in str(city):
+        city = city.replace(" ", "_")
+    try:
+        cur.execute(f"SELECT * FROM {city}_property_data")
+        data=cur.fetchall()
+        conn.close()
+        print("found!!")
+        return data
     except:
         print("not found...")
         return "not found"

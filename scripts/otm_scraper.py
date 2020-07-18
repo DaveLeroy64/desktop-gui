@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup 
 import pandas 
 import re 
+import numbers
 import numpy as np
 from datetime import datetime
 
@@ -102,6 +103,12 @@ def scanner(city, radius):
         print (str(len(proplist)) + " properties found")
         print ("On " + str(numpages) + " pages\n")
         df = pandas.DataFrame(proplist)
+        print(type(df['Beds']))
+        for bed in df['Beds']:
+            if not isinstance(bed, numbers.Integral):
+                bed = 1
+            print(bed)
+            print(type(bed))
 
         try:
             otm_avprice = np.asarray(df["Price"], dtype=np.int).mean()
@@ -115,6 +122,24 @@ def scanner(city, radius):
         except:
             print("Cannot calculate average")
             otm_avprice = 0
+
+        avbeds = 0
+        for bed in df['Beds']:
+            try:
+                avbeds += int(bed)
+                print("good bed")
+            except:
+                print("bad bed")
+
+        # try:
+        # otm_avbeds = np.asarray(int(df["Beds"]), dtype=np.int).mean()
+        otm_avbeds = avbeds / len(df['Beds'])
+        print("Average Beds: ")
+        print(otm_avbeds)
+        
+        # except:
+        #     print("Cannot calculate average BEDS")
+        #     otm_avbeds = 0
 
         print(f"Saving {len(proplist)} properties to {city.upper()} database...")
         storage.connect(city)
@@ -131,4 +156,4 @@ def scanner(city, radius):
 
         print("Saved to DB")
 
-        return otm_properties_saved, otm_properties_existing, int(otm_avprice)
+        return otm_properties_saved, otm_properties_existing, int(otm_avprice), otm_avbeds

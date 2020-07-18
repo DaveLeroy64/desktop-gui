@@ -134,13 +134,18 @@ def scanner(city, radius):
             print("Average Price: ")
             print(zoo_avprice)
             print("Properties with price not explicitly specified excluded from average")
-
-            # with open("average_prices.txt", 'a') as file:
-            #     file.write(f"\n{search_time}_Average Price from Zoopla for properties within {radius} miles of {city}: " + "£" + str(int(avprice)))
         
         except:
             print("Cannot calculate average")
             zoo_avprice = 0
+        try:
+            zoo_avbeds = np.asarray(df["Beds"], dtype=np.int).mean()
+            print("Average Beds: ")
+            print(zoo_avbeds)
+        
+        except:
+            print("Cannot calculate average BEDS")
+            zoo_avbeds = 0
 
         
         print(f"Saving {len(proplist)} properties to {city.upper()} database...")
@@ -156,8 +161,13 @@ def scanner(city, radius):
                 zoo_properties_existing += 1
             print(f"Saved {zoo_properties_saved} to {city} - {zoo_properties_existing} already in database")
 
+        # it should be ok having this functionality in properties.py...it should take the avprice from all properties just scraped not just those in DB anyway
+        # print("Now storing to averages database...")
+        # datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
+        # storage.store_property_data(city, zoo_avprice, datecollected)
+
         print("Saved to DB")
         sendback = f"{zoo_properties_saved} properties within {radius}m\nAverage Price: £{round(zoo_avprice, 2)}"
         if zoo_properties_existing > 0:
             sendback += f"\n{zoo_properties_existing} already stored"
-        return zoo_properties_saved, zoo_properties_existing, int(zoo_avprice)
+        return int(zoo_properties_saved), int(zoo_properties_existing), int(zoo_avprice), int(zoo_avbeds)

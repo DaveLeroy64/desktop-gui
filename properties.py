@@ -23,7 +23,7 @@ from scripts import zoopla_scraper, otm_scraper
 from scripts import storage
 
 # from main import Ui_MainWindow
-import main
+import main, prop_av_table
 import sys
 import time
 
@@ -64,26 +64,38 @@ class Ui_PropertyWindow(object):
         self.scan_progress_bar.setProperty("value", step)
         step = step + step_increment
         self.scan_progress_bar.setProperty("value", step)
-        zoo_props_saved, zoo_props_exist, zoo_avprice = zoopla_scraper.scanner(city, radius)
-        otm_props_saved, otm_props_exist, otm_avprice = otm_scraper.scanner(city, radius)
-        print("scan complete")
 
-        tot_props_saved = zoo_props_saved + otm_props_saved
-        tot_props_exist = zoo_props_exist + otm_props_exist
-        av_avprice = (zoo_avprice + otm_avprice) / 2
+        try:
+            zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = zoopla_scraper.scanner(city, radius)
+            otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = otm_scraper.scanner(city, radius)
+            print("scan complete")
 
-        print(zoo_avprice)
-        print(otm_avprice)
+            tot_props_saved = zoo_props_saved + otm_props_saved
+            tot_props_exist = zoo_props_exist + otm_props_exist
+            av_avprice = (zoo_avprice + otm_avprice) / 2
 
-        print("Now storing to averages database...")
-        datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
-        storage.store_property_data(city, av_avprice, datecollected)
+            
+            av_avbeds = (zoo_avbeds + otm_avbeds) / 2
 
-        results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
+            print(zoo_avprice)
+            print(otm_avprice)
 
-        self.scan_results_label.setText(str(results))
-        time.sleep(1)
-        self.scan_progress_bar.setProperty("value", 0)
+            print("Now storing to averages database...")
+            self.scan_results_label.setText("Saving to database...")
+            
+            datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
+            storage.store_property_data(city, datecollected, av_avprice, round(av_avbeds, 1), (tot_props_exist + tot_props_saved))
+            print("avbeds: " + str(zoo_avbeds) + " otm: " + str(otm_avbeds))
+            results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
+
+            self.scan_results_label.setText(str(results))
+            time.sleep(1)
+            self.scan_progress_bar.setProperty("value", 0)
+
+        except Exception as error:
+            result = error
+            self.scan_results_label.setText(str(result))
+        
 
     def search(self):
         # wondering why event loop error? because it asks for user input i think
@@ -114,7 +126,11 @@ class Ui_PropertyWindow(object):
         row = table.rowCount()
         table.setRowCount(row+1)
         col = 0
+        print("row data")
+        print(row_data)
         for item in row_data[1:]: # exclude ID, no need to display
+            print("item")
+            print(item)
             cell = QtWidgets.QTableWidgetItem(str(item))
             table.setItem(row, col, cell)
             col += 1
@@ -246,10 +262,14 @@ class Ui_PropertyWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 826, 21))
         self.menubar.setObjectName("menubar")
+
         self.menuMenu = QtWidgets.QMenu(self.menubar)
         self.menuMenu.setObjectName("menuMenu")
+
         self.menuPrograms = QtWidgets.QMenu(self.menubar)
         self.menuPrograms.setObjectName("menuPrograms")
+        self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
+        self.menuProperty_Data.setObjectName("menuProperty_Data")
         self.menuAPI = QtWidgets.QMenu(self.menubar)
         self.menuAPI.setObjectName("menuAPI")
         self.menuComputer = QtWidgets.QMenu(self.menubar)
@@ -268,8 +288,6 @@ class Ui_PropertyWindow(object):
 
         self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         self.actionNews_Scraper.setObjectName("actionNews_Scraper")
-        self.actionProperty_Data = QtWidgets.QAction(MainWindow)
-        self.actionProperty_Data.setObjectName("actionProperty_Data")
         self.actionPolscraper = QtWidgets.QAction(MainWindow)
         self.actionPolscraper.setObjectName("actionPolscraper")
         self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
@@ -278,10 +296,25 @@ class Ui_PropertyWindow(object):
         self.actionLocal_Information.setObjectName("actionLocal_Information")
         self.actionLock = QtWidgets.QAction(MainWindow)
         self.actionLock.setObjectName("actionLock")
+
+        self.actionProperty_Data = QtWidgets.QAction(MainWindow)
+        self.actionProperty_Data.setObjectName("actionProperty_Data")
+        self.actionPrice_Display = QtWidgets.QAction(MainWindow)
+        self.actionPrice_Display.setObjectName("actionPrice_Display")
+        # self.actionPrice_Display.triggered.connect(self.toPriceDisplay)
+
+        self.actionPrice_Data = QtWidgets.QAction(MainWindow)
+        self.actionPrice_Data.setObjectName("actionPrice_Data")
+        self.actionPrice_Data.triggered.connect(self.toPriceData)
+
+
         self.menuMenu.addAction(self.actionMain)
         self.menuMenu.addAction(self.actionExit)
         self.menuPrograms.addAction(self.actionNews_Scraper)
-        self.menuPrograms.addAction(self.actionProperty_Data)
+        self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
+        self.menuProperty_Data.addAction(self.actionProperty_Data)
+        self.menuProperty_Data.addAction(self.actionPrice_Display)
+        self.menuProperty_Data.addAction(self.actionPrice_Data)
         self.menuPrograms.addAction(self.actionPolscraper)
         self.menuAPI.addAction(self.actionDarkSky_Weather)
         self.menuAPI.addAction(self.actionLocal_Information)
@@ -290,6 +323,8 @@ class Ui_PropertyWindow(object):
         self.menubar.addAction(self.menuPrograms.menuAction())
         self.menubar.addAction(self.menuAPI.menuAction())
         self.menubar.addAction(self.menuComputer.menuAction())
+
+        
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -313,11 +348,15 @@ class Ui_PropertyWindow(object):
         self.actionMain.setText(_translate("MainWindow", "Main Menu"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
-        self.actionProperty_Data.setText(_translate("MainWindow", "Property Data"))
+        self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
         self.actionPolscraper.setText(_translate("MainWindow", "Polscraper"))
         self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         self.actionLock.setText(_translate("MainWindow", "Lock"))
+        self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
+        self.actionPrice_Display.setText(_translate("MainWindow", "Price Display"))
+        self.actionPrice_Data.setText(_translate("MainWindow", "Price Data"))
+
 
     def toMainMenu(self):
         print("to main menu")
@@ -326,6 +365,13 @@ class Ui_PropertyWindow(object):
         self.ui.setupUi(self.main_menu)
         MainWindow.destroy()
         self.main_menu.show()
+    def toPriceData(self):
+        print("to price data")
+        self.price_data=QtWidgets.QMainWindow()
+        self.ui = prop_av_table.Ui_MainWindow()
+        self.ui.setupUi(self.price_data)
+        MainWindow.destroy()
+        self.price_data.show()
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()

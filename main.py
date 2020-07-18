@@ -11,9 +11,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
+import prop_av_table
 
 import sqlite3
 import webbrowser
+import sys
 from scripts import storage
 
 class Ui_MainWindow(object):
@@ -80,6 +82,8 @@ class Ui_MainWindow(object):
 
         self.menuPrograms = QtWidgets.QMenu(self.menubar)
         self.menuPrograms.setObjectName("menuPrograms")
+        self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
+        self.menuProperty_Data.setObjectName("menuProperty_Data")
 
         self.menuAPI = QtWidgets.QMenu(self.menubar)
         self.menuAPI.setObjectName("menuAPI")
@@ -99,7 +103,12 @@ class Ui_MainWindow(object):
 
         self.actionProperty_Data = QtWidgets.QAction(MainWindow)
         self.actionProperty_Data.setObjectName("actionProperty_Data")
+        self.actionPrice_Display = QtWidgets.QAction(MainWindow)
+        self.actionPrice_Display.setObjectName("actionPrice_Display")
+        self.actionPrice_Data = QtWidgets.QAction(MainWindow)
+        self.actionPrice_Data.setObjectName("actionPrice_Data")
         self.actionProperty_Data.triggered.connect(self.to_properties)
+        self.actionPrice_Data.triggered.connect(self.toPriceData)
 
         self.actionPolscraper = QtWidgets.QAction(MainWindow)
         self.actionPolscraper.setObjectName("actionPolscraper")
@@ -115,7 +124,10 @@ class Ui_MainWindow(object):
 
         self.menuMenu.addAction(self.actionExit)
         self.menuPrograms.addAction(self.actionNews_Scraper)
-        self.menuPrograms.addAction(self.actionProperty_Data)
+        self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
+        self.menuProperty_Data.addAction(self.actionProperty_Data)
+        self.menuProperty_Data.addAction(self.actionPrice_Display)
+        self.menuProperty_Data.addAction(self.actionPrice_Data)
         self.menuPrograms.addAction(self.actionPolscraper)
         self.menuAPI.addAction(self.actionDarkSky_Weather)
         self.menuAPI.addAction(self.actionLocal_Information)
@@ -140,11 +152,16 @@ class Ui_MainWindow(object):
         self.menuComputer.setTitle(_translate("MainWindow", "Computer"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
-        self.actionProperty_Data.setText(_translate("MainWindow", "Property Data"))
+        self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
         self.actionPolscraper.setText(_translate("MainWindow", "Polscraper"))
         self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         self.actionLock.setText(_translate("MainWindow", "Lock"))
+
+        
+        self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
+        self.actionPrice_Display.setText(_translate("MainWindow", "Price Display"))
+        self.actionPrice_Data.setText(_translate("MainWindow", "Price Data"))
 
     def to_properties(self, MainWindow):
         # if password = correct
@@ -155,6 +172,13 @@ class Ui_MainWindow(object):
         MainWindow.close()
         self.property_window.show()
         # MainWindow.close()
+    def toPriceData(self):
+        print("to price data")
+        self.price_data=QtWidgets.QMainWindow()
+        self.ui = prop_av_table.Ui_MainWindow()
+        self.ui.setupUi(self.price_data)
+        MainWindow.destroy()
+        self.price_data.show()
     
 
     def loadData(self):
@@ -173,13 +197,17 @@ class Ui_MainWindow(object):
 
 
 
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_PropertyWindow()
+ui.setupUi(MainWindow)
 
-if __name__ == "__main__":
-    print("called from other")
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     print("called from other")
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

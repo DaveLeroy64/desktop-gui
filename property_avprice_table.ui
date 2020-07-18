@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>826</width>
+    <height>554</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QComboBox" name="citylist">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>60</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="city_select">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>30</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Select City</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="graph_button">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>120</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>View Graph</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="title">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Property Trend Data</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="data_table">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>461</width>
+      <height>491</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>826</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuPrograms">
+    <property name="title">
+     <string>Programs</string>
+    </property>
+    <widget class="QMenu" name="menuProperty_Data">
+     <property name="title">
+      <string>Property Data</string>
+     </property>
+     <addaction name="actionPrice_Display"/>
+     <addaction name="actionPrice_Data"/>
+    </widget>
+    <addaction name="actionNews_Scraper"/>
+    <addaction name="menuProperty_Data"/>
+    <addaction name="actionPolscraper"/>
+   </widget>
+   <widget class="QMenu" name="menuAPI">
+    <property name="title">
+     <string>API</string>
+    </property>
+    <addaction name="actionDarkSky_Weather"/>
+    <addaction name="actionLocal_Information"/>
+   </widget>
+   <widget class="QMenu" name="menuComputer">
+    <property name="title">
+     <string>Computer</string>
+    </property>
+    <addaction name="actionLock"/>
+   </widget>
+   <addaction name="menuMenu"/>
+   <addaction name="menuPrograms"/>
+   <addaction name="menuAPI"/>
+   <addaction name="menuComputer"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionNews_Scraper">
+   <property name="text">
+    <string>News Scraper</string>
+   </property>
+  </action>
+  <action name="actionPolscraper">
+   <property name="text">
+    <string>Polscraper</string>
+   </property>
+  </action>
+  <action name="actionDarkSky_Weather">
+   <property name="text">
+    <string>DarkSky Weather</string>
+   </property>
+  </action>
+  <action name="actionLocal_Information">
+   <property name="text">
+    <string>Local Information</string>
+   </property>
+  </action>
+  <action name="actionLock">
+   <property name="text">
+    <string>Lock</string>
+   </property>
+  </action>
+  <action name="actionPrice_Display">
+   <property name="text">
+    <string>Price Display</string>
+   </property>
+  </action>
+  <action name="actionPrice_Data">
+   <property name="text">
+    <string>Price Data</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
