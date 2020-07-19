@@ -63,6 +63,7 @@ def scanner(city, radius):
 
     if len(all) < 1:
         print("\nNothing found. Ensure city name entered correctly.")
+        # return 0, 0, 0, 0 then check in properties main file and change label to "city not found" or something
 
     i = 0
     proplist = []

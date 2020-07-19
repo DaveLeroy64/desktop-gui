@@ -99,7 +99,7 @@ class Ui_GraphWindow(object):
         # self.change_me_to_plot.setGeometry(QtCore.QRect(0, 40, 611, 451))
         # self.change_me_to_plot.setObjectName("change_me_to_plot")
 
-        self.date_axis = TimeAxisItem(orientation="bottom")
+        self.date_axis = TimeAxisItem(orientation="bottom") # necessary to show date instead of a weird number
         self.graph = pg.PlotWidget(self.centralwidget, axisItems = {'bottom': self.date_axis})
         self.graph.setGeometry(QtCore.QRect(0, 40, 611, 451))
         self.graph.setObjectName("Price Trend")
