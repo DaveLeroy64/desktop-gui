@@ -22,6 +22,9 @@ numpages = 1
 # over every page, that calls the PAGE SCAN function contained in HERE,
 # that scrapes the properties off THAT page
 
+# or what if we used a function in HERE that referenced the step variable in PROPERTIES MAIN
+# adding the INCREMENT to it with each loop?
+
 # since the over 50 pages prompt crashes Qt, we can then pass that prompt to a
 # popupbox that is prompted if the return from the pages calc function is over 50
 # the OK button can then continue the scan, or cancel can abort it
