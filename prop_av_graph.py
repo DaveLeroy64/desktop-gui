@@ -14,6 +14,7 @@ import pyqtgraph as pg
 import sys, os
 from scripts import storage
 from datetime import datetime
+import properties, prop_av_table
 
 class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
@@ -21,27 +22,28 @@ class TimeAxisItem(pg.AxisItem):
 
 
 
-class Ui_MainWindow(object):
-
-    # def __init__(self):
-    #     self.prop trying to receive signal from table to get current city
-
-    def city_from_table(self, *args):
-        print("city: " + args[0])
-        self.populate_graph(args[0])
-        # would this work if i RETURN it instead...?
+class Ui_GraphWindow(object):
 
     def get_cities(self):
         return storage.get_all_cities()
 
     def populate_graph(self, *args):
-        if not args:        
+        print("city in citylist drop down is:")
+        # print(self.citylist.currentText())
+
+        if type(args[0]) == int: # why DOES args return an integer? is it the index? why does it return that?
             city = self.citylist.currentText()
+            print("args is an INTEGER, so city is: " + str(city))
         else:
             city = args[0]
-        print(f"Fetching {city} from DB")
+            print("args is a STRING, so city is: " + args[0])
 
+        print(f"Fetching {city} from DB")
+        print("selected city:")
+        print(city)
         data = storage.view_property_data(city)
+        print("graph file city:")
+        print(data)
         if data == 'not found':
             step=100
             self.title.setText(f"{city.upper()} data not in in database")
@@ -49,6 +51,7 @@ class Ui_MainWindow(object):
 
         else:
             self.graph.clear()
+                
             print(data)
 
             dates = []
@@ -76,6 +79,13 @@ class Ui_MainWindow(object):
             pen = pg.mkPen(width=2)
             self.graph.plot([d for d in dates], avprices, pen=pen, symbol="+", symbolSize = 15)
             # axisItems = {'bottom': date_axis}, 
+
+    def city_from_table(self, city):
+        print(city)
+        print(city + "ok we can call this function from another script. Now how do we populate the graph")
+        # but the below function doest work
+        # it insists that graph window doesnt have "graph"
+        Ui_GraphWindow.populate_graph(Ui_GraphWindow, city)
 
 
 
@@ -230,18 +240,12 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
-    def toPriceDisplay(self):
-        print("to price data")
-        self.price_display=QtWidgets.QMainWindow()
-        self.ui = prop_av_graph.Ui_MainWindow()
-        self.ui.setupUi(self.price_display)
-        MainWindow.destroy()
-        self.price_display.show()
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
-ui = Ui_MainWindow()
+ui = Ui_GraphWindow()
 ui.setupUi(MainWindow)
+# Ui_MainWindow.city_from_table()
 # if __name__ == "__main__":
 #     import sys
 #     app = QtWidgets.QApplication(sys.argv)

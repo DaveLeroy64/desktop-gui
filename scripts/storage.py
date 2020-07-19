@@ -215,6 +215,8 @@ def get_all_cities():
 
 
 def view_property_data(city):    
+    print("storage file for:")
+    print(city)
     print("view data for " + city)
     conn=sqlite3.connect("./pcp.db")
     cur=conn.cursor()

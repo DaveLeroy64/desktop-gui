@@ -14,7 +14,7 @@ import prop_av_graph, properties
 import sys, os
 
 
-class Ui_MainWindow(object):
+class Ui_TableWindow(object):
 
     def toMainMenu(self):
         print("to main menu")
@@ -196,33 +196,29 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.property_main)
         MainWindow.destroy()
         self.property_main.show()
-    def toPriceData(self):
-        print("to price data")
-        self.price_data=QtWidgets.QMainWindow()
-        self.ui = prop_av_table.Ui_MainWindow()
-        self.ui.setupUi(self.price_data)
-        MainWindow.destroy()
-        self.price_data.show()
 
     # MAKE THIS FUNCTION PASS THE CITY CURRENTLY SELECTED TO THE
     # DATA WINDOW TO DISPLAY ON LOADING AS WELL!
     # MAYBE BY CALLING A FUNCTION IN THE PY FILE IN THIS FUNCTION HERE
+    # current_city_signal = QtCore.pyqtSignal(str, name="cityname_signal")
+    # cant get this to work...
     def toPriceDisplay(self):
-        current_city_signal = QtCore.pyqtSignal(str)
         print("to price data")
-        current_city = self.citylist.currentText() # this function pass to show in table
-        current_city_signal.emit(current_city)
+        current_city = self.citylist.currentText() 
         self.price_display=QtWidgets.QMainWindow()
-        self.ui = prop_av_graph.Ui_MainWindow()
+        self.ui = prop_av_graph.Ui_GraphWindow()
         self.ui.setupUi(self.price_display)
-        # MainWindow.destroy()
+        MainWindow.destroy()
         self.price_display.show()
-        print("current city: " + current_city)
-        prop_av_graph.city_from_table(current_city)
+        prop_av_graph.Ui_GraphWindow.city_from_table(self, current_city)
+
+        print("show: " + current_city)
+
+
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
-ui = Ui_MainWindow()
+ui = Ui_TableWindow()
 ui.setupUi(MainWindow)
 # if __name__ == "__main__":
 #     print("we're in")

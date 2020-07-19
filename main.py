@@ -176,14 +176,14 @@ class Ui_MainWindow(object):
     def toPriceData(self):
         print("to price data")
         self.price_data=QtWidgets.QMainWindow()
-        self.ui = prop_av_table.Ui_MainWindow()
+        self.ui = prop_av_table.Ui_TableWindow()
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
     def toPriceDisplay(self):
         print("to price data")
         self.price_display=QtWidgets.QMainWindow()
-        self.ui = prop_av_graph.Ui_MainWindow()
+        self.ui = prop_av_graph.Ui_GraphWindow()
         self.ui.setupUi(self.price_display)
         MainWindow.destroy()
         self.price_display.show()
