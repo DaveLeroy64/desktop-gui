@@ -30,6 +30,8 @@ def scanner(city, radius):
     global numpages
     accepted_radii = [1, 3, 5, 10, 15, 20, 30, 40]
 
+    city=city.lower()
+
     if int(radius) not in accepted_radii:
         return "Please enter a search radius of\n1, 3, 5, 10, 15, 20, 30 or 40 miles"
 

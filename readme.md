@@ -1,6 +1,6 @@
 DESKTOP GUI
 
-For doing useful python things easily
+For doing useful python things easily. Work in progress, much more to be added.
 
 To do:
 

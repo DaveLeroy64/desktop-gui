@@ -16,6 +16,7 @@ search_time = datetime.now().strftime("%Y-%m-%d_%H%M")
 
 def scanner(city, radius):
     search_time = datetime.now().strftime("%Y-%m-%d_%H%M")
+    city=city.lower()
 
 
     headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'}
@@ -67,7 +68,7 @@ def scanner(city, radius):
         for item in all:
             property = {}
             i += 1
-
+            print("property OTM")
             try:
                 print(str(item.find("span", {"class":"title"}).text))
             except:
