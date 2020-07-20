@@ -36,7 +36,7 @@ def scanner(city, radius):
     city=city.lower()
 
     if int(radius) not in accepted_radii:
-        return "Please enter a search radius of\n1, 3, 5, 10, 15, 20, 30 or 40 miles"
+        return "Please enter a search radius of \n1, 3, 5, 10, 15, 20, 30 or 40 miles"
 
 
     search_time = datetime.now().strftime("%Y-%m-%d_%H%M")

@@ -11,7 +11,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
-import prop_av_table, prop_av_graph
+import prop_av_table, prop_av_graph, polscraper_main
+
+from plyer import notification
 
 import sqlite3
 import webbrowser
@@ -113,6 +115,7 @@ class Ui_MainWindow(object):
 
         self.actionPolscraper = QtWidgets.QAction(MainWindow)
         self.actionPolscraper.setObjectName("actionPolscraper")
+        self.actionPolscraper.triggered.connect(self.toPolscraper)
 
         self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
         self.actionDarkSky_Weather.setObjectName("actionDarkSky_Weather")
@@ -187,6 +190,13 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.price_display)
         MainWindow.destroy()
         self.price_display.show()
+    def toPolscraper(self):
+        print("to price data")
+        self.polscraper=QtWidgets.QMainWindow()
+        self.ui = polscraper_main.Ui_PolscraperWindow()
+        self.ui.setupUi(self.polscraper)
+        MainWindow.destroy()
+        self.polscraper.show()
     
 
     def loadData(self):
@@ -201,6 +211,7 @@ class Ui_MainWindow(object):
             r[3].replace("\n", "")
             newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
             self.news_list_view.addItem(newsitem)
+        notification.notify(title="Python Control Panel", message=f"News scraper completed. {len(result)} articles collected.")
         
 
 

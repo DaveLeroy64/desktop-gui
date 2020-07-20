@@ -14,7 +14,7 @@ import pyqtgraph as pg
 import sys, os
 from scripts import storage
 from datetime import datetime
-import properties, prop_av_table
+import properties, prop_av_table, main
 
 class TimeAxisItem(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
@@ -177,9 +177,11 @@ class Ui_GraphWindow(object):
         # self.actionLock.setObjectName("actionLock")
 
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
-        self.actionPrice_Display.setObjectName("actionPrice_Display")
+        self.actionPrice_Display.setObjectName("actionPrice_Display") # is actually property main
+        self.actionPrice_Display.triggered.connect(self.toPropertyMain)
         self.actionPrice_Data = QtWidgets.QAction(MainWindow)
         self.actionPrice_Data.setObjectName("actionPrice_Data")
+        self.actionPrice_Data.triggered.connect(self.toPriceData)
 
         self.menuMenu.addAction(self.actionExit)
         self.menuPrograms.addAction(self.actionPrice_Display)
@@ -229,14 +231,14 @@ class Ui_GraphWindow(object):
     def toPropertyMain(self):
         print("to main menu")
         self.main_menu=QtWidgets.QMainWindow()
-        self.ui = main.Ui_MainWindow()
+        self.ui = properties.Ui_PropertyWindow()
         self.ui.setupUi(self.main_menu)
         MainWindow.destroy()
         self.main_menu.show()
     def toPriceData(self):
         print("to price data")
         self.price_data=QtWidgets.QMainWindow()
-        self.ui = prop_av_table.Ui_MainWindow()
+        self.ui = prop_av_table.Ui_TableWindow()
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()

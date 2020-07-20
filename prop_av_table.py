@@ -10,19 +10,19 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import storage
-import prop_av_graph, properties
+import prop_av_graph, properties, main
 import sys, os
 
 
 class Ui_TableWindow(object):
 
-    def toMainMenu(self):
-        print("to main menu")
-        self.main_menu=QtWidgets.QMainWindow()
-        self.ui = main.Ui_MainWindow()
-        self.ui.setupUi(self.main_menu)
-        MainWindow.destroy()
-        self.main_menu.show()
+    # def toMainMenu(self):
+    #     print("to main menu")
+    #     self.main_menu=QtWidgets.QMainWindow()
+    #     self.ui = main.Ui_MainWindow()
+    #     self.ui.setupUi(self.main_menu)
+    #     MainWindow.destroy()
+    #     self.main_menu.show()
 
     def populate_table(self):        
         self.data_table.setRowCount(0)

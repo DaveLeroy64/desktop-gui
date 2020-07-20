@@ -14,6 +14,8 @@ from datetime import datetime
 from scripts import zoopla_scraper, otm_scraper
 from scripts import storage
 
+from plyer import notification
+
 # from main import Ui_MainWindow
 import main, prop_av_table, prop_av_graph
 import sys
@@ -40,17 +42,21 @@ class Ui_PropertyWindow(object):
         value = self.search_radius_slider.value()
         self.search_radius_label.setText("Search Radius: " + str(value))
 
-    def interval_scan(self):
+    def interval_scan(self, intervals, cities_to_scan):
+        scanning_active = False
         """
         This function is only an example for now. Will be implemented later for regular periodic scanning.
         Must make sure to use this function as a separate thread...
         """
 
-        intervals = {
-            '3_per_day':['08:00:00', '16:00:00', '23:59:00'],
-            '2_per_day':['09:00:00','21:00:00'],
-            '1_per_day':['12:00:00']
-        }
+        # THE ARGUMENTS RECEIVED MUST BE LIKE THIS:
+        # intervals = {
+        #     '3_per_day':['08:00:00', '16:00:00', '23:59:00'],
+        #     '2_per_day':['09:00:00','21:00:00'],
+        #     '1_per_day':['12:00:00']
+        # }
+
+        # cities_to_scan = []
 
         while scanning_active == True:
             current_time = datetime.now().strftime("%H:%M:%S")
@@ -106,11 +112,15 @@ class Ui_PropertyWindow(object):
                 time.sleep(1)
                 self.scan_progress_bar.setProperty("value", 0)
 
+                # if not interval scan?
+                notification.notify(title="Python Control Panel", message=f"{city[0].upper()}{city[1:].lower()} scan completed. {tot_props_saved} new properties added to database")
+
             except Exception as error:
                 result = error
                 self.scan_results_label.setText(str(result))
+                notification.notify(title= "Python Control Panel", message= f"Property Scanner Error: {str(result)}")
         else:
-            self.scan_results_label.setText("Please enter a radius of1, 3, 5, 10, 15, 20, 30 or 40")
+            self.scan_results_label.setText("Please enter a radius of 1, 3, 5, 10, 15, 20, 30 or 40")
 
         
 
