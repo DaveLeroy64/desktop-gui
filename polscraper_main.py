@@ -16,6 +16,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal, QThread
 from plyer import notification
 from polscraper import polscraper
 
@@ -24,13 +25,93 @@ import os
 import threading
 step = 0
 
+class ScannerThread(QThread):
+    scanner_signal = pyqtSignal("PyQt_PyObject",)
+
+    def __init__(self, pages_to_scan, interval):
+        QThread.__init__(self)
+        self.pages_to_scan = pages_to_scan
+        self.interval = interval
+
+    def run(self):
+
+        if self.interval != "Once":
+            pages, threads, replies, next_scan_time = polscraper.repeating(self.interval, self.pages_to_scan)
+            next_scan_time = " Next scan scheduled for: " + str(next_scan_time.strftime('%H:%M:%S'))
+            print("scan started")
+            self.scanner_signal.emit(pages, threads, replies, next_scan_time)
+            # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
+
+
+        else:
+            pages, threads, replies = polscraper.single(self.pages_to_scan)
+            print("scan started")
+            self.scanner_signal.emit(pages, threads, replies)
+            # pages, threads, replies = polscraper.single(pages_to_scan)
+            # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
+
+        
+
 
 class Ui_PolscraperWindow(object):
+
+    def run_scanner(self):
+        pages_to_scan = int(self.pagesList.currentText())
+        interval = self.intervalList.currentText()
+
+        self.scan_results_label.setText("Scanning...")
+
+        print("starting scan thread")
+
+        if interval != "Once":
+            self.scanButton.setEnabled(False)
+            interval = int(interval)
+            self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
+            self.scanButton.setEnabled(False)
+
+            self.scan_thread = ScannerThread(pages_to_scan, interval)
+            self.scan_thread.scanner_signal.connect(self.scan_complete)
+
+            self.scan_thread.start()
+            # pages, threads, replies, next_scan_time = polscraper.repeating(interval, pages_to_scan)
+
+        else:
+            self.scanButton.setEnabled(False)
+
+            self.scan_thread = ScannerThread(pages_to_scan, interval)
+            self.scan_thread.scanner_signal.connect(self.scan_complete)
+
+            self.scan_thread.start()
+            # pages, threads, replies = polscraper.single(pages_to_scan)
+
+
+
+        
+
+    def scan_complete(self, *args):
+        print("scan complete, results:")
+        print(args)
+
+        scan_result = f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored."
+
+        if args[3]:
+            scan_result += str(args[3])
+
+        self.scanButton.setEnabled(True)
+
+        self.reportsList.clear()
+        for file in os.listdir("polscraper/reports"):
+                self.reportsList.addItem(file)
+
+        self.scan_results_label.setText(scan_result)
+
+
     def setupUi(self, PolscraperWindow):
         PolscraperWindow.setObjectName("PolscraperWindow")
         PolscraperWindow.resize(436, 554)
         self.centralwidget = QtWidgets.QWidget(PolscraperWindow)
         self.centralwidget.setObjectName("centralwidget")
+
 
         
         # self.scan_thread = threading.Thread(name="scan_thread", target=self.run_scanner)
@@ -63,12 +144,15 @@ class Ui_PolscraperWindow(object):
         self.reportsList = QtWidgets.QListWidget(self.centralwidget)
         self.reportsList.setGeometry(QtCore.QRect(0, 50, 256, 461))
         self.reportsList.setObjectName("reportsList")
-        for file in os.listdir("polscraper/reports"):
-            self.reportsList.addItem(file)
-            # if "analysis" in file:
-            #     self.reportsList.addItem("-------------------------------------------------")
+        try:
+            for file in os.listdir("polscraper/reports"):
+                self.reportsList.addItem(file)
+                # if "analysis" in file:
+                #     self.reportsList.addItem("-------------------------------------------------")
+            self.reportsList.itemDoubleClicked.connect(self.open_file)
+        except:
+            self.reportsList.addItem("No reports found")
         
-        self.reportsList.itemDoubleClicked.connect(self.open_file)
 
 
 
@@ -167,6 +251,10 @@ class Ui_PolscraperWindow(object):
         self.retranslateUi(PolscraperWindow)
         QtCore.QMetaObject.connectSlotsByName(PolscraperWindow)
 
+        
+        # self.scan_thread = ScannerThread(pages_to_scan, interval)
+        # self.scan_thread.scanner_signal.connect(self.scan_complete)
+
     def retranslateUi(self, PolscraperWindow):
         _translate = QtCore.QCoreApplication.translate
         PolscraperWindow.setWindowTitle(_translate("PolscraperWindow", "Polscraper Main"))
@@ -186,31 +274,31 @@ class Ui_PolscraperWindow(object):
         self.actionSentiment.setText(_translate("PolscraperWindow", "Sentiment"))
 
 
-    def run_scanner(self):
-        """
-        This must eventually be put into a separate thread
-        """
+    # def run_scanner(self):
+    #     """
+    #     This is the original - currently attempting to make a threaded version
+    #     """
 
-        pages_to_scan = self.pagesList.currentText()
-        interval = self.intervalList.currentText()
+    #     pages_to_scan = self.pagesList.currentText()
+    #     interval = self.intervalList.currentText()
 
-        if interval != "Once":
-            self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
-            pages, threads, replies, next_scan_time = polscraper.repeating(interval, pages_to_scan)
+    #     if interval != "Once":
+    #         self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
+    #         pages, threads, replies, next_scan_time = polscraper.repeating(interval, pages_to_scan)
             
-            self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
+    #         self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
 
-        else:
-            pages, threads, replies = polscraper.single(pages_to_scan)
-            print("polscraper main")
-            print(pages)
-            print(threads)
-            print(replies)
-            self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
+    #     else:
+    #         pages, threads, replies = polscraper.single(pages_to_scan)
+    #         print("polscraper main")
+    #         print(pages)
+    #         print(threads)
+    #         print(replies)
+    #         self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
 
-        self.reportsList.clear()
-        for file in os.listdir("polscraper/reports"):
-                self.reportsList.addItem(file)
+    #     self.reportsList.clear()
+    #     for file in os.listdir("polscraper/reports"):
+    #             self.reportsList.addItem(file)
 
         # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
         # notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")

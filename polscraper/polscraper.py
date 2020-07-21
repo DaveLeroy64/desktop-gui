@@ -159,7 +159,7 @@ def repeating(scan_delay, pages):
 
 def single(pages):
     if pages == 1:
-        pages = [""]
+        scanpages = [""]
     else:
         scanpages = [*range(2, int(pages)+1)]
         scanpages.insert(0, "")
