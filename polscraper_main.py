@@ -11,6 +11,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from polscraper import polscraper
 
+import time
+import os
+step = 0
+
 
 class Ui_PolscraperWindow(object):
     def setupUi(self, PolscraperWindow):
@@ -20,8 +24,10 @@ class Ui_PolscraperWindow(object):
         self.centralwidget.setObjectName("centralwidget")
 
         self.scan_results_label = QtWidgets.QLabel(self.centralwidget)
-        self.scan_results_label.setGeometry(QtCore.QRect(670, 390, 151, 61))
-        self.scan_results_label.setText("")
+        self.scan_results_label.setGeometry(QtCore.QRect(270, 270, 151, 61))
+        self.scan_results_label.setText("Select how many pages to scan and how often (at what interval) and click SCAN to generate new report/s")
+        self.scan_results_label.setWordWrap(True)
+        self.scan_results_label.setAlignment(QtCore.Qt.AlignCenter)
         self.scan_results_label.setObjectName("scan_results_label")
 
         self.pagesList = QtWidgets.QComboBox(self.centralwidget)
@@ -41,9 +47,17 @@ class Ui_PolscraperWindow(object):
         self.scanButton.setObjectName("scanButton")
         self.scanButton.clicked.connect(self.run_scanner)
 
-        self.reportsList = QtWidgets.QTableView(self.centralwidget)
+        self.reportsList = QtWidgets.QListWidget(self.centralwidget)
         self.reportsList.setGeometry(QtCore.QRect(0, 50, 256, 461))
         self.reportsList.setObjectName("reportsList")
+        for file in os.listdir("polscraper/reports"):
+            self.reportsList.addItem(file)
+            # if "analysis" in file:
+            #     self.reportsList.addItem("-------------------------------------------------")
+        
+        self.reportsList.itemDoubleClicked.connect(self.open_file)
+
+
 
         self.title = QtWidgets.QLabel(self.centralwidget)
         self.title.setGeometry(QtCore.QRect(50, 10, 161, 31))
@@ -54,13 +68,17 @@ class Ui_PolscraperWindow(object):
         self.title.setFont(font)
         self.title.setObjectName("title")
 
+        self.intervals = [1, 2, 4, 6, 8, 12, 24, 36, 48]
+
         self.intervalList = QtWidgets.QComboBox(self.centralwidget)
         self.intervalList.setGeometry(QtCore.QRect(290, 150, 111, 22))
         self.intervalList.setObjectName("intervalList")
         self.intervalList.addItem("Once")
-        for i in range(1, 65):
-            if i % 5 == 0:
-                self.intervalList.addItem(str(i))
+        for i in self.intervals:
+            if i == 1:
+                self.intervalList.addItem(str(i) + " hour")
+            else:
+                self.intervalList.addItem(str(i) + " hours")
 
         self.scanResultsBox = QtWidgets.QLabel(self.centralwidget)
         self.scanResultsBox.setGeometry(QtCore.QRect(290, 260, 111, 101))
@@ -155,14 +173,37 @@ class Ui_PolscraperWindow(object):
         self.actionSentiment.setText(_translate("PolscraperWindow", "Sentiment"))
 
     def run_scanner(self):
-        pages = self.pagesList.currentText()
+        self.scan_results_label.setText("Scanning...")
+
+        pages_to_scan = self.pagesList.currentText()
         interval = self.intervalList.currentText()
-        polscraper.test(pages, interval)
 
         if interval != "Once":
-            polscraper.repeating(interval, pages)
+            self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
+            pages, threads, replies = polscraper.repeating(interval, pages_to_scan)
         else:
-            polscraper.single(pages)
+            pages, threads, replies = polscraper.single(pages_to_scan)
+            print("polscraper main")
+            print(pages)
+            print(threads)
+            print(replies)
+
+        self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
+    
+    def open_file(self, file):
+        print("opening " + file.text())
+        try:
+            os.startfile(f'polscraper\\reports\\{file.text()}')
+            self.scan_results_label.setText(f"Opening {file.text()}")
+        except Exception as err:
+            self.scan_results_label.setText(f"{err}")
+
+
+    # def update_progress_bar(self, amount):
+    #     global step
+    #     step_increment = (100 / len(amount))
+    #     step = step + step_increment
+    #     self.progressBar.setProperty("value", step)
 
 
 if __name__ == "__main__":

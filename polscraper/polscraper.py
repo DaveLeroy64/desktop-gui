@@ -135,17 +135,24 @@ def scanner(pages):
     print("Running language analysis...")
     analyzer(filename)
     
+    return len(pages), len(threads), len(replies)
+    
 
 def repeating(scan_delay, pages):
     scanpages = [*range(2, int(pages)+1)]
     scanpages.insert(0, "")
+
+    hour_interval = int(scan_delay.split()[0])
+    scan_delay = int(hour_interval) * 3600
+    
     while True:
-        scanner(scanpages)
+        pages, threads, replies = scanner(scanpages)
         current_time = datetime.datetime.now()#.strftime('%H%M:%S')
         next_scan_time = current_time + datetime.timedelta(seconds=int(scan_delay))
         print(f"Next scan will take place at: {str(next_scan_time.strftime('%H:%M:%S'))}")
         time.sleep(int(scan_delay))
         print("\nRestarting scan\n")
+    return pages, threads, replies
 
 def single(pages):
     if pages == 1:
@@ -156,11 +163,11 @@ def single(pages):
         print("scanning:")
         print(scanpages)
         print("---")
-    scanner(scanpages)
+    pages, threads, replies = scanner(scanpages)
     time.sleep(2)
     print("Scan complete. Program terminated.")
     # exit()
-    return "complete"
+    return pages, threads, replies
 
 def init():
     run_mode = input("Run scan once or in repeat?\n")
