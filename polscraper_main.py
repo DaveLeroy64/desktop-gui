@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from plyer import notification
 from polscraper import polscraper
 
 import time
@@ -189,6 +190,7 @@ class Ui_PolscraperWindow(object):
             print(replies)
 
         self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
+        notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
     
     def open_file(self, file):
         print("opening " + file.text())
