@@ -13,6 +13,7 @@ from html.parser import HTMLParser
 import json
 import os
 from .language_analyzer import analyzer
+from plyer import notification
 
 headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'}
 
@@ -150,9 +151,11 @@ def repeating(scan_delay, pages):
         current_time = datetime.datetime.now()#.strftime('%H%M:%S')
         next_scan_time = current_time + datetime.timedelta(seconds=int(scan_delay))
         print(f"Next scan will take place at: {str(next_scan_time.strftime('%H:%M:%S'))}")
+        
+        notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
         time.sleep(int(scan_delay))
         print("\nRestarting scan\n")
-    return pages, threads, replies
+    return pages, threads, replies, next_scan_time
 
 def single(pages):
     if pages == 1:
@@ -166,6 +169,8 @@ def single(pages):
     pages, threads, replies = scanner(scanpages)
     time.sleep(2)
     print("Scan complete. Program terminated.")
+    
+    notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
     # exit()
     return pages, threads, replies
 
