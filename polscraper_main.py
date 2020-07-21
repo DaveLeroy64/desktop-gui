@@ -26,7 +26,7 @@ import threading
 step = 0
 
 class ScannerThread(QThread):
-    scanner_signal = pyqtSignal("PyQt_PyObject",)
+    scanner_signal = pyqtSignal("PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject")
 
     def __init__(self, pages_to_scan, interval):
         QThread.__init__(self)
@@ -38,15 +38,13 @@ class ScannerThread(QThread):
         if self.interval != "Once":
             pages, threads, replies, next_scan_time = polscraper.repeating(self.interval, self.pages_to_scan)
             next_scan_time = " Next scan scheduled for: " + str(next_scan_time.strftime('%H:%M:%S'))
-            print("scan started")
             self.scanner_signal.emit(pages, threads, replies, next_scan_time)
             # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
 
 
         else:
             pages, threads, replies = polscraper.single(self.pages_to_scan)
-            print("scan started")
-            self.scanner_signal.emit(pages, threads, replies)
+            self.scanner_signal.emit(pages, threads, replies, "nothing because we're not doing another scan")
             # pages, threads, replies = polscraper.single(pages_to_scan)
             # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored.")
 
@@ -65,7 +63,7 @@ class Ui_PolscraperWindow(object):
 
         if interval != "Once":
             self.scanButton.setEnabled(False)
-            interval = int(interval)
+            # interval = int(interval[0])
             self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
             self.scanButton.setEnabled(False)
 
@@ -92,9 +90,9 @@ class Ui_PolscraperWindow(object):
         print("scan complete, results:")
         print(args)
 
-        scan_result = f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored."
+        scan_result = f"Scan complete. {int(args[0])} pages, {int(args[1])} threads and {int(args[2])} replies stored."
 
-        if args[3]:
+        if "scheduled" in args[3]:
             scan_result += str(args[3])
 
         self.scanButton.setEnabled(True)
