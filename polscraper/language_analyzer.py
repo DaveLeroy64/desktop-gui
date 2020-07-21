@@ -5,12 +5,14 @@ import datetime
 from tqdm import tqdm # pylint: disable=import-error
 # import polscraper# is this needed?
 # from polscraper import filename
-from .sent_terms import categories, scores
+from .sent_terms import categories
 from heapq import nlargest
 import os
 
 
 def analyzer(filename):
+    all_categories = dict(vars(categories))
+    scores = {}
 
     with open(f"polscraper\\reports\\{filename}") as sentfile:
         data = json.load(sentfile)
@@ -22,80 +24,36 @@ def analyzer(filename):
     time.sleep(2)
 
 
-    for thread in tqdm(data):
-        if len(thread['Replies']) > 0:
-            i = 0
-            reply = thread['Replies'][i]['Post']#is this needed?
-            for reply in thread['Replies']:
-                replytext = reply['Post']
-                if any(word.lower() in replytext for word in categories.jews):
-                    scores.jews = scores.jews + 1
+    # for thread in tqdmdata:
+    #     if len(thread['Replies']) > 0:
+            # i = 0
 
-                if any(word in replytext for word in categories.blacks):
-                    scores.blacks = scores.blacks + 1
+    for category, value in all_categories.items(): 
+        if "_" not in str(category):
+            scores[str(category)] = 0
+            print(str(category) + " key words:")
+            print(type(value))
+            print(str(value))
+            
+            for thread in data:
+                if len(thread['Replies']) > 0:
+                    i = 0
+                    reply = thread['Replies'][i]['Post']#is this needed?
+                    for reply in thread['Replies']:
+                        replytext = reply['Post']
+                        print(replytext)
+                        print(str(category) + " score: " + str(scores[str(category)]))
+                        if any(word.lower() in replytext for word in value):
+                            scores[str(category)] += 1
+                    # print(str(category) + " score: " + str(scores[str(category)]))
+                    print("\n\n")
+                    i += 1
 
-                if any(word in replytext for word in categories.disease):
-                    scores.disease = scores.disease + 1
+            print(scores)
+            print("++++++++++")
 
-                if any(word in replytext for word in categories.china):
-                    scores.china = scores.china + 1
-
-                if any(word.lower() in replytext for word in categories.africa):
-                    scores.africa = scores.africa + 1
-
-                if any(word in replytext for word in categories.europe):
-                    scores.europe = scores.europe + 1
-
-                if any(word in replytext for word in categories.usa):
-                    scores.usa = scores.usa + 1
-
-                if any(word in replytext for word in categories.southkorea):
-                    scores.southkorea = scores.southkorea + 1
-
-                if any(word in replytext for word in categories.japan):
-                    scores.japan = scores.japan + 1
-
-                if any(word in replytext for word in categories.northkorea):
-                    scores.northkorea += 1
-
-                if any(word in replytext for word in categories.war):
-                    scores.war = scores.war + 1
-
-                if any(word in replytext for word in categories.women):
-                    scores.women = scores.war + 1
-
-                if any(word in replytext for word in categories.trans):
-                    scores.trans = scores.trans + 1
-
-                if any(word in replytext for word in categories.sex):
-                    scores.sex = scores.sex + 1
-
-                if any(word in replytext for word in categories.incel):
-                    scores.incel = scores.incel + 1
-
-                if any(word in replytext for word in categories.muslims):
-                    scores.muslims = scores.muslims + 1
-
-                if any(word in replytext for word in categories.climate):
-                    scores.climate = scores.climate + 1
-
-                if any(word in replytext for word in categories.middleeast):
-                    scores.middleeast = scores.middleeast + 1
-
-                if any(word in replytext for word in categories.vegans):
-                    scores.vegans = scores.vegans + 1
-
-                if any(word in replytext for word in categories.boomers):
-                    scores.boomers = scores.boomers + 1
-
-                if any(word in replytext for word in categories.zoomers):
-                    scores.zoomers = scores.zoomers + 1
-
-                if any(word in replytext for word in categories.millennials):
-                    scores.zoomers = scores.millennials + 1
-                
-            i += 1
-
+    ## THIS FINALLY WORKS
+    # NOW I JUST NEED TO CHANGE THE BELOW TO BE A FOR LOOP INSTEAD OF WHAT IT CURRENTLY IS!!!
 
 
     analysis_filename = datetime.datetime.now().strftime(f'{filename[:-5]}_analysis.json')
