@@ -74,6 +74,13 @@ def analyzer(filename):
     topics = d
     del topics['Date']
     del topics['Time']
+    if topics['blacks'] > 0:
+        topics['blacks'] = topics['blacks'] / 5
+        print("Weighting BLACK topic down")
+    if topics['jews'] > 0:
+        topics['jews'] = topics['jews'] / 5
+        print("Weighting JEW topic down")
+
 
     topic = nlargest(3, d, key=topics.get)
     print("\nThe biggest topics of conversation at the moment are:")

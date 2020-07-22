@@ -10,6 +10,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QThread, pyqtSignal
 from datetime import datetime
 from scripts import zoopla_scraper, otm_scraper
 from scripts import storage
@@ -21,6 +22,21 @@ import main, prop_av_table, prop_av_graph
 import sys
 import time
 from datetime import datetime
+
+
+class ScraperThread(QThread):
+    scraper_signal = pyqtSignal("PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", )
+
+    def __init__(self, city, radius):
+        QThread.__init__(self)
+        self.city = city
+        self.radius = radius
+
+    def run(self):        
+        zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = zoopla_scraper.scanner(self.city, self.radius)
+        otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = otm_scraper.scanner(self.city, self.radius)
+        self.scraper_signal.emit(self.city, zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds, otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds)
+        
 
 
 
@@ -85,42 +101,49 @@ class Ui_PropertyWindow(object):
         self.scan_progress_bar.setProperty("value", step)
 
         if radius in accepted_radii:
+
             try:
-                zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = zoopla_scraper.scanner(city, radius)
-                otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = otm_scraper.scanner(city, radius)
-                print("scan complete")
-
-                tot_props_saved = zoo_props_saved + otm_props_saved
-                tot_props_exist = zoo_props_exist + otm_props_exist
-                av_avprice = (zoo_avprice + otm_avprice) / 2
-
-                
-                av_avbeds = (zoo_avbeds + otm_avbeds) / 2
-
-                print(zoo_avprice)
-                print(otm_avprice)
-
-                print("Now storing to averages database...")
-                self.scan_results_label.setText("Saving to database...")
-                
-                datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
-                storage.store_property_data(city, datecollected, av_avprice, round(av_avbeds, 1), (tot_props_exist + tot_props_saved))
-                print("avbeds: " + str(zoo_avbeds) + " otm: " + str(otm_avbeds))
-                results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
-
-                self.scan_results_label.setText(str(results))
-                time.sleep(1)
-                self.scan_progress_bar.setProperty("value", 0)
-
-                # if not interval scan?
-                notification.notify(title="Python Control Panel", message=f"{city[0].upper()}{city[1:].lower()} scan completed. {tot_props_saved} new properties added to database")
+                self.scan_thread = ScraperThread(city, radius)
+                self.scan_thread.scraper_signal.connect(self.scan_complete)
+                self.scan_thread.start()
+                self.scan_new_properties_button.setEnabled(False)
 
             except Exception as error:
                 result = error
                 self.scan_results_label.setText(str(result))
                 notification.notify(title= "Python Control Panel", message= f"Property Scanner Error: {str(result)}")
+
         else:
             self.scan_results_label.setText("Please enter a radius of 1, 3, 5, 10, 15, 20, 30 or 40")
+
+    def scan_complete(self, city, zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds, otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds):
+
+        tot_props_saved = zoo_props_saved + otm_props_saved
+        tot_props_exist = zoo_props_exist + otm_props_exist
+        av_avprice = (zoo_avprice + otm_avprice) / 2
+
+        
+        av_avbeds = (zoo_avbeds + otm_avbeds) / 2
+
+        print(zoo_avprice)
+        print(otm_avprice)
+
+        print("Now storing to averages database...")
+        self.scan_results_label.setText("Saving to database...")
+        
+        datecollected = datetime.now().strftime("%Y-%m-%d_%H:%M")
+        storage.store_property_data(city, datecollected, av_avprice, round(av_avbeds, 1), (tot_props_exist + tot_props_saved))
+        print("avbeds: " + str(zoo_avbeds) + " otm: " + str(otm_avbeds))
+        results = f"{city.upper()}: {tot_props_saved} new properties saved. {tot_props_exist} already in database. Average price: {av_avprice}"
+
+        self.scan_results_label.setText(str(results))
+        time.sleep(1)
+        self.scan_progress_bar.setProperty("value", 0)
+
+        self.scan_new_properties_button.setEnabled(True)
+
+        # if not interval scan?
+        notification.notify(title="Python Control Panel", message=f"{city[0].upper()}{city[1:].lower()} scan completed. {tot_props_saved} new properties added to database")
 
         
 
