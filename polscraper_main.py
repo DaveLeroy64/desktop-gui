@@ -20,8 +20,10 @@ from PyQt5.QtCore import pyqtSignal, QThread
 from plyer import notification
 from polscraper import polscraper
 
+import main, polscraper_data
+
 import time
-import os
+import os, sys
 import threading
 step = 0
 
@@ -229,16 +231,25 @@ class Ui_PolscraperWindow(object):
         self.actionExit = QtWidgets.QAction(PolscraperWindow)
         self.actionExit.setObjectName("actionExit")
 
+        self.actionMainMenu = QtWidgets.QAction(PolscraperWindow)
+        self.actionMainMenu.setObjectName("actionMainMenu")
+        self.actionMainMenu.triggered.connect(self.toMainMenu)
+
         self.actionPolscraper = QtWidgets.QAction(PolscraperWindow)
         self.actionPolscraper.setObjectName("actionPolscraper")
 
 
         self.actionDataDisplay = QtWidgets.QAction(PolscraperWindow)
         self.actionDataDisplay.setObjectName("actionDataDisplay")
+        self.actionDataDisplay.triggered.connect(self.toPolscraperData)
+
         self.actionSentiment = QtWidgets.QAction(PolscraperWindow)
         self.actionSentiment.setObjectName("actionSentiment")
+
         self.actionScheduler = QtWidgets.QAction(PolscraperWindow)
         self.actionScheduler.setObjectName("actionScheduler")
+
+        self.menuMenu.addAction(self.actionMainMenu)
         self.menuMenu.addAction(self.actionExit)
         self.menuPolscraper.addAction(self.actionDataDisplay)
         self.menuPolscraper.addAction(self.actionSentiment)
@@ -263,6 +274,7 @@ class Ui_PolscraperWindow(object):
         self.new_scan_title.setText(_translate("PolscraperWindow", "Run New Scan"))
         self.menuMenu.setTitle(_translate("PolscraperWindow", "Menu"))
         self.menuPolscraper.setTitle(_translate("PolscraperWindow", "Polscraper"))
+        self.actionMainMenu.setText(_translate("PolscraperWindow", "Main Menu"))
         self.actionExit.setText(_translate("PolscraperWindow", "Exit"))
  
         self.actionPolscraper.setText(_translate("PolscraperWindow", "Polscraper"))
@@ -272,35 +284,6 @@ class Ui_PolscraperWindow(object):
         self.actionSentiment.setText(_translate("PolscraperWindow", "Sentiment"))
 
 
-    # def run_scanner(self):
-    #     """
-    #     This is the original - currently attempting to make a threaded version
-    #     """
-
-    #     pages_to_scan = self.pagesList.currentText()
-    #     interval = self.intervalList.currentText()
-
-    #     if interval != "Once":
-    #         self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
-    #         pages, threads, replies, next_scan_time = polscraper.repeating(interval, pages_to_scan)
-            
-    #         self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
-
-    #     else:
-    #         pages, threads, replies = polscraper.single(pages_to_scan)
-    #         print("polscraper main")
-    #         print(pages)
-    #         print(threads)
-    #         print(replies)
-    #         self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
-
-    #     self.reportsList.clear()
-    #     for file in os.listdir("polscraper/reports"):
-    #             self.reportsList.addItem(file)
-
-        # self.scan_results_label.setText(f"Scan complete. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
-        # notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
-    
     def open_file(self, file):
         print("opening " + file.text())
         try:
@@ -308,21 +291,34 @@ class Ui_PolscraperWindow(object):
             self.scan_results_label.setText(f"Opening {file.text()}")
         except Exception as err:
             self.scan_results_label.setText(f"{err}")
+        
+    def toMainMenu(self):
+        print("to main menu")
+        self.main_menu=QtWidgets.QMainWindow()
+        self.ui = main.Ui_MainWindow()
+        self.ui.setupUi(self.main_menu)
+        PolscraperWindow.destroy()
+        self.main_menu.show()
+    def toPolscraperData(self):
+        print("to polscraper data")
+        self.polscraper_data=QtWidgets.QMainWindow()
+        self.ui = polscraper_data.Ui_DataWindow()
+        self.ui.setupUi(self.polscraper_data)
+        PolscraperWindow.destroy()
+        self.polscraper_data.show()
 
 
-    # def update_progress_bar(self, amount):
-    #     global step
-    #     step_increment = (100 / len(amount))
-    #     step = step + step_increment
-    #     self.progressBar.setProperty("value", step)
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     PolscraperWindow = QtWidgets.QMainWindow()
+#     ui = Ui_PolscraperWindow()
+#     ui.setupUi(PolscraperWindow)
+#     PolscraperWindow.show()
+#     sys.exit(app.exec_())
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    PolscraperWindow = QtWidgets.QMainWindow()
-    ui = Ui_PolscraperWindow()
-    ui.setupUi(PolscraperWindow)
-    PolscraperWindow.show()
-    sys.exit(app.exec_())
+app = QtWidgets.QApplication(sys.argv)
+PolscraperWindow = QtWidgets.QMainWindow()
+ui = Ui_PolscraperWindow()
+ui.setupUi(PolscraperWindow)
 

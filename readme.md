@@ -7,6 +7,9 @@ TRIGGER WARNING: POLSCRAPER scans 4chan, a website that contains highly offensiv
 To do:
 
 - Add multithreading so scrapers can run at same time as using the GUI
+    - Polscraper and property scraper put in separate threads. Need to do news scraper
 - Add a popup to property scraper if there are more than 50 pages to confirm if you want to continue
+- Add threads/replies as lists in polscraper file so that it can return the actual number of threads/replies it scans. Or just make them an integer and with each iteration of the for loop it adds 1 to it.
+- ALSO just realised that the label in polscraper data display covers the "clear data" button and that's why I can't click it. Change the geometry of the label
 
 - Somehow find out how to get cross-file function calls working without getting attribute error for local variables!!
