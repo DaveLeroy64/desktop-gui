@@ -35,10 +35,6 @@ class Ui_DataWindow(object):
         reportname = self.a_mainReportList.currentText()
         reportfilename = glob.glob(f"polscraper\\reports\\*{reportname}_pol_sentiment_analysis.json")[0]
                  
-        try:
-            self.label.setText("Table displaying: " + str(reportname)  + " Pages scanned: " + str(data[0]['Pages']))
-        except:
-            self.label.setText("Table displaying: " + str(reportname)) 
 
 
         with open(f"{reportfilename}") as report_json_file:
@@ -46,6 +42,13 @@ class Ui_DataWindow(object):
 
         del data[0]['Date']
         del data[0]['Time']
+
+        try:
+            self.label.setText("Table displaying: " + str(reportname)  + " Pages scanned: " + str(data[0]['Pages']))
+            del data[0]['Pages']
+        except:
+            self.label.setText("Table displaying: " + str(reportname)) 
+            
 
         # sort data in reverse order
         data = {k: v for k, v in sorted(data[0].items(), key=lambda item: item[1])}
@@ -106,7 +109,7 @@ class Ui_DataWindow(object):
         self.dataGraph.clear()
         self.dataGraph.addItem(bg1)
         print("graph on display")
-        
+
     def setupUi(self, DataWindow):
         DataWindow.setObjectName("DataWindow")
         DataWindow.resize(1124, 635)
