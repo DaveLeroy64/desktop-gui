@@ -134,7 +134,7 @@ def scanner(pages):
     print("Data saved in file: " + "reports\\" + filename)
 
     print("Running language analysis...")
-    analyzer(filename)
+    analyzer(filename, len(pages))
     
     return len(pages), len(threads), len(replies)
     

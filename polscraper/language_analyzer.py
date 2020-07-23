@@ -8,7 +8,7 @@ from heapq import nlargest
 import os
 
 
-def analyzer(filename):
+def analyzer(filename, numpages):
     all_categories = dict(vars(categories))
     scores = {}
 
@@ -52,6 +52,7 @@ def analyzer(filename):
     d = dict()
     d['Date'] = str(thedate)
     d['Time'] = str(thetime)
+    d['Pages'] = numpages
 
     for key, value in scores.items():
         d[key] = value
@@ -74,12 +75,13 @@ def analyzer(filename):
     topics = d
     del topics['Date']
     del topics['Time']
+    del topics['Pages']
+
+    # accounting for the community's excessive use of specific slurs
     if topics['blacks'] > 0:
         topics['blacks'] = topics['blacks'] / 5
-        print("Weighting BLACK topic down")
     if topics['jews'] > 0:
         topics['jews'] = topics['jews'] / 5
-        print("Weighting JEW topic down")
 
 
     topic = nlargest(3, d, key=topics.get)

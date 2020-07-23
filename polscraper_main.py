@@ -233,16 +233,16 @@ class Ui_PolscraperWindow(object):
         self.actionPolscraper.setObjectName("actionPolscraper")
 
 
-        self.actionGraph = QtWidgets.QAction(PolscraperWindow)
-        self.actionGraph.setObjectName("actionGraph")
-        self.actionTable = QtWidgets.QAction(PolscraperWindow)
-        self.actionTable.setObjectName("actionTable")
+        self.actionDataDisplay = QtWidgets.QAction(PolscraperWindow)
+        self.actionDataDisplay.setObjectName("actionDataDisplay")
         self.actionSentiment = QtWidgets.QAction(PolscraperWindow)
         self.actionSentiment.setObjectName("actionSentiment")
+        self.actionScheduler = QtWidgets.QAction(PolscraperWindow)
+        self.actionScheduler.setObjectName("actionScheduler")
         self.menuMenu.addAction(self.actionExit)
-        self.menuPolscraper.addAction(self.actionGraph)
-        self.menuPolscraper.addAction(self.actionTable)
+        self.menuPolscraper.addAction(self.actionDataDisplay)
         self.menuPolscraper.addAction(self.actionSentiment)
+        self.menuPolscraper.addAction(self.actionScheduler)
         self.menubar.addAction(self.menuMenu.menuAction())
         self.menubar.addAction(self.menuPolscraper.menuAction())
 
@@ -267,8 +267,8 @@ class Ui_PolscraperWindow(object):
  
         self.actionPolscraper.setText(_translate("PolscraperWindow", "Polscraper"))
 
-        self.actionGraph.setText(_translate("PolscraperWindow", "Graph"))
-        self.actionTable.setText(_translate("PolscraperWindow", "Table"))
+        self.actionDataDisplay.setText(_translate("PolscraperWindow", "Data Display"))
+        self.actionScheduler.setText(_translate("PolscraperWindow", "Scheduler"))
         self.actionSentiment.setText(_translate("PolscraperWindow", "Sentiment"))
 
 
