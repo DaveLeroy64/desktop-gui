@@ -181,6 +181,7 @@ def repeating(scan_delay, pages):
         
         if type(replies) == int:
             notification.notify(title="Python Control Panel", message=f"Polscraper scan completed. {int(pages)} pages, {int(threads)} threads and {int(replies)} replies stored. Next scan scheduled for {str(next_scan_time.strftime('%H:%M:%S'))}")
+            print("scan active status:")
             print(scanning_active)
             time.sleep(int(scan_delay))
             print("\nRestarting scan\n")
@@ -212,6 +213,8 @@ def single(pages):
     else:
         print("notification cancelled - scan terminated")
     # exit()
+    print("scan active status:")
+    print(scanning_active)
     return pages, threads, replies
 
 def disable_scan():
