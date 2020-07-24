@@ -14,9 +14,12 @@ import random
 from heapq import nlargest
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtChart import QChart, QChartView, QValueAxis, QBarCategoryAxis, QBarSet, QBarSeries
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QPainter
+
+import main, polscraper_main
 
 
 import pyqtgraph as pg
@@ -288,12 +291,15 @@ class Ui_DataWindow(object):
         DataWindow.setStatusBar(self.statusbar)
         self.actionMain_Menu = QtWidgets.QAction(DataWindow)
         self.actionMain_Menu.setObjectName("actionMain_Menu")
+        self.actionMain_Menu.triggered.connect(self.toMainMenu)
 
         self.actionExit = QtWidgets.QAction(DataWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(self.exit_program)
 
         self.actionPolscraper_Main = QtWidgets.QAction(DataWindow)
         self.actionPolscraper_Main.setObjectName("actionPolscraper_Main")
+        self.actionPolscraper_Main.triggered.connect(self.toPolscraperMain)
 
         self.actionScheduler = QtWidgets.QAction(DataWindow)
         self.actionScheduler.setObjectName("actionScheduler")
@@ -336,6 +342,38 @@ class Ui_DataWindow(object):
         self.actionScheduler.setText(_translate("DataWindow", "Scheduler"))
         self.actionSentiment.setText(_translate("DataWindow", "Sentiment"))
 
+        
+    def toMainMenu(self):
+        print("to main menu")
+        self.main_menu=QtWidgets.QMainWindow()
+        self.ui = main.Ui_MainWindow()
+        self.ui.setupUi(self.main_menu)
+        DataWindow.destroy()
+        self.main_menu.show()
+    def toPolscraperMain(self):
+        print("to polscraper data")
+        self.polscraper_main=QtWidgets.QMainWindow()
+        self.ui = polscraper_main.Ui_PolscraperWindow()
+        self.ui.setupUi(self.polscraper_main)
+        DataWindow.destroy()
+        self.polscraper_main.show()
+    def exit_program(self):
+        cfm = QMessageBox()
+        cfm.setWindowTitle("Close PCP?")
+        cfm.setText("Confirm if you want to close the Python Control Panel")
+        cfm.setIcon(QMessageBox.Information)
+        cfm.setStandardButtons(QMessageBox.Close | QMessageBox.Cancel)
+        cfm.setDefaultButton(QMessageBox.Cancel)
+
+        cfm.buttonClicked.connect(self.closeprogram)
+        x = cfm.exec_()
+
+    def closeprogram(self, i):
+        order = i.text()
+        if order == 'Close':
+            exit()
+        else:
+            print(i.text())
 
 # if __name__ == "__main__":
 #     import sys

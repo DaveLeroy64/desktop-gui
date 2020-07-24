@@ -16,6 +16,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import pyqtSignal, QThread
 from plyer import notification
 from polscraper import polscraper
@@ -230,6 +231,7 @@ class Ui_PolscraperWindow(object):
         PolscraperWindow.setStatusBar(self.statusbar)
         self.actionExit = QtWidgets.QAction(PolscraperWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(self.exit_program)
 
         self.actionMainMenu = QtWidgets.QAction(PolscraperWindow)
         self.actionMainMenu.setObjectName("actionMainMenu")
@@ -306,6 +308,23 @@ class Ui_PolscraperWindow(object):
         self.ui.setupUi(self.polscraper_data)
         PolscraperWindow.destroy()
         self.polscraper_data.show()
+    def exit_program(self):
+        cfm = QMessageBox()
+        cfm.setWindowTitle("Close PCP?")
+        cfm.setText("Confirm if you want to close the Python Control Panel")
+        cfm.setIcon(QMessageBox.Information)
+        cfm.setStandardButtons(QMessageBox.Close | QMessageBox.Cancel)
+        cfm.setDefaultButton(QMessageBox.Cancel)
+
+        cfm.buttonClicked.connect(self.closeprogram)
+        x = cfm.exec_()
+
+    def closeprogram(self, i):
+        order = i.text()
+        if order == 'Close':
+            exit()
+        else:
+            print(i.text())
 
 
 # if __name__ == "__main__":

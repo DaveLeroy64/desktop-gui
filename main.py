@@ -9,6 +9,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+from PyQt5.QtWidgets import QMessageBox
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
 import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
@@ -96,6 +98,7 @@ class Ui_MainWindow(object):
 
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(self.exit_program)
         self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         self.actionNews_Scraper.setObjectName("actionNews_Scraper")
 
@@ -221,6 +224,23 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.polscraperdata)
         MainWindow.destroy()
         self.polscraperdata.show()
+    def exit_program(self):
+        cfm = QMessageBox()
+        cfm.setWindowTitle("Close PCP?")
+        cfm.setText("Confirm if you want to close the Python Control Panel")
+        cfm.setIcon(QMessageBox.Information)
+        cfm.setStandardButtons(QMessageBox.Close | QMessageBox.Cancel)
+        cfm.setDefaultButton(QMessageBox.Cancel)
+
+        cfm.buttonClicked.connect(self.closeprogram)
+        x = cfm.exec_()
+
+    def closeprogram(self, i):
+        order = i.text()
+        if order == 'Close':
+            exit()
+        else:
+            print(i.text())
     
 
     def loadData(self):

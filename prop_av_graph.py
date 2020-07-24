@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from pyqtgraph import PlotWidget, plot, DateAxisItem
 import pyqtgraph as pg
 import sys, os
@@ -164,6 +165,7 @@ class Ui_GraphWindow(object):
 
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(self.exit_program)
 
         # self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         # self.actionNews_Scraper.setObjectName("actionNews_Scraper")
@@ -242,6 +244,23 @@ class Ui_GraphWindow(object):
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
+    def exit_program(self):
+        cfm = QMessageBox()
+        cfm.setWindowTitle("Close PCP?")
+        cfm.setText("Confirm if you want to close the Python Control Panel")
+        cfm.setIcon(QMessageBox.Information)
+        cfm.setStandardButtons(QMessageBox.Close | QMessageBox.Cancel)
+        cfm.setDefaultButton(QMessageBox.Cancel)
+
+        cfm.buttonClicked.connect(self.closeprogram)
+        x = cfm.exec_()
+
+    def closeprogram(self, i):
+        order = i.text()
+        if order == 'Close':
+            exit()
+        else:
+            print(i.text())
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()

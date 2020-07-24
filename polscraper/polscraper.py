@@ -33,6 +33,9 @@ def scanner(pages):
     
     all_post_data = []
 
+    thread_count = 0
+    reply_count = 0
+
     #print("Scanning threads...")
     for page in pages:
         r = requests.get(f'https://boards.4chan.org/pol/{page}', headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'})
@@ -44,6 +47,7 @@ def scanner(pages):
         #GET OP's
         print(f"Scanning page {page}")
         for thread in tqdm(threads):
+            thread_count += 1
             title = thread.select_one(".subject")
             op = thread.select_one(".opContainer blockquote")
             op_name = thread.select_one(".name").get_text()
@@ -85,6 +89,7 @@ def scanner(pages):
             replies = replyscanner.select(".replyContainer")
 
             for reply in replies:
+                reply_count += 1
                 reply_data = dict()
 
                 try:
@@ -136,7 +141,7 @@ def scanner(pages):
     print("Running language analysis...")
     analyzer(filename, len(pages))
     
-    return len(pages), len(threads), len(replies)
+    return len(pages), thread_count, reply_count
     
 
 def repeating(scan_delay, pages):

@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 from scripts import storage
 import prop_av_graph, properties, main
 import sys, os
@@ -127,6 +128,7 @@ class Ui_TableWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(self.exit_program)
         # self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         # self.actionNews_Scraper.setObjectName("actionNews_Scraper")
         # self.actionPolscraper = QtWidgets.QAction(MainWindow)
@@ -196,6 +198,23 @@ class Ui_TableWindow(object):
         self.ui.setupUi(self.property_main)
         MainWindow.destroy()
         self.property_main.show()
+    def exit_program(self):
+        cfm = QMessageBox()
+        cfm.setWindowTitle("Close PCP?")
+        cfm.setText("Confirm if you want to close the Python Control Panel")
+        cfm.setIcon(QMessageBox.Information)
+        cfm.setStandardButtons(QMessageBox.Close | QMessageBox.Cancel)
+        cfm.setDefaultButton(QMessageBox.Cancel)
+
+        cfm.buttonClicked.connect(self.closeprogram)
+        x = cfm.exec_()
+
+    def closeprogram(self, i):
+        order = i.text()
+        if order == 'Close':
+            exit()
+        else:
+            print(i.text())
 
     # MAKE THIS FUNCTION PASS THE CITY CURRENTLY SELECTED TO THE
     # DATA WINDOW TO DISPLAY ON LOADING AS WELL!
