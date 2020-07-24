@@ -125,10 +125,13 @@ class Ui_PolscraperWindow(object):
 
         self.scan_results_label = QtWidgets.QLabel(self.centralwidget)
         self.scan_results_label.setGeometry(QtCore.QRect(270, 310, 151, 61))
-        self.scan_results_label.setText("Select how many pages to scan and how often (at what interval) and click SCAN to generate new report/s")
         self.scan_results_label.setWordWrap(True)
         self.scan_results_label.setAlignment(QtCore.Qt.AlignCenter)
         self.scan_results_label.setObjectName("scan_results_label")
+        if polscraper.scanning_active:
+            self.scan_results_label.setText("Scan is currently running")
+        else:
+            self.scan_results_label.setText("Select how many pages to scan and how often (at what interval) and click SCAN to generate new report/s")
 
         self.pagesList = QtWidgets.QComboBox(self.centralwidget)
         self.pagesList.setGeometry(QtCore.QRect(290, 100, 111, 22))
@@ -146,13 +149,26 @@ class Ui_PolscraperWindow(object):
         self.scanButton.setGeometry(QtCore.QRect(300, 190, 91, 31))
         self.scanButton.setObjectName("scanButton")
         self.scanButton.clicked.connect(self.run_scanner)
+        if polscraper.scanning_active:
+            self.scanButton.setEnabled(False)
+        else:
+            self.scanButton.setEnabled(True)
         # self.scanButton.clicked.connect(self.scan_thread.start())
 
+        # if polscraper.scanning_active == true set button to disabled
+        # if polscraper.scanning_active == false set button to disabled
+        # would this work??? then you can reopen this window and button will be appropriately en/disabled
         self.cancelScanButton = QtWidgets.QPushButton(self.centralwidget)
         self.cancelScanButton.setGeometry(QtCore.QRect(300, 230, 91, 31))
         self.cancelScanButton.setObjectName("cancelScanButton")
         self.cancelScanButton.clicked.connect(self.stop_scan)
-        self.cancelScanButton.setEnabled(False)
+        print("polscraper scanning active status:")
+        print(polscraper.scanning_active)
+        if polscraper.scanning_active:
+            self.cancelScanButton.setEnabled(True)
+        else:
+            self.cancelScanButton.setEnabled(False)
+
 
         self.reportsList = QtWidgets.QListWidget(self.centralwidget)
         self.reportsList.setGeometry(QtCore.QRect(0, 50, 256, 461))
@@ -326,6 +342,9 @@ class Ui_PolscraperWindow(object):
         print("stop scan")
         polscraper.disable_scan()
         print("scan should now have terminated")
+        self.scan_results_label.setText("Scan terminated")
+        self.scanButton.setEnabled(True)
+        self.cancelScanButton.setEnabled(False)
 
 
     def exit_program(self):

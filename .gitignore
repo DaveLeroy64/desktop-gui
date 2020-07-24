@@ -4,3 +4,4 @@ reports/
 *.csv
 sent_terms.py
 average_prices.txt
+api.py
