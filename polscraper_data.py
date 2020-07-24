@@ -113,7 +113,8 @@ class Ui_DataWindow(object):
         self.dataGraph.clear()
         self.dataGraph.addItem(bg1)
 
-        self.graphTitle.setText(f"Top 3 topics: {categories[0]}, {categories[1]}, {categories[2]}")
+        # self.graphTitle.setText(f"Top 3 topics: {categories[0]}, {categories[1]}, {categories[2]}") disabled for sensitivity
+        self.graphTitle.setText(f"Topic frequency visualisation")
         print("graph on display")
 
     def setupUi(self, DataWindow):
