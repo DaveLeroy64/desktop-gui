@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
-import prop_av_table, prop_av_graph, polscraper_main
+import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
 
 from plyer import notification
 
@@ -82,10 +82,6 @@ class Ui_MainWindow(object):
         self.menuMenu = QtWidgets.QMenu(self.menubar)
         self.menuMenu.setObjectName("menuMenu")
 
-        self.menuPrograms = QtWidgets.QMenu(self.menubar)
-        self.menuPrograms.setObjectName("menuPrograms")
-        self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
-        self.menuProperty_Data.setObjectName("menuProperty_Data")
 
         self.menuAPI = QtWidgets.QMenu(self.menubar)
         self.menuAPI.setObjectName("menuAPI")
@@ -103,6 +99,13 @@ class Ui_MainWindow(object):
         self.actionNews_Scraper = QtWidgets.QAction(MainWindow)
         self.actionNews_Scraper.setObjectName("actionNews_Scraper")
 
+
+        self.menuPrograms = QtWidgets.QMenu(self.menubar)
+        self.menuPrograms.setObjectName("menuPrograms")
+
+        self.menuProperty_Data = QtWidgets.QMenu(self.menuPrograms)
+        self.menuProperty_Data.setObjectName("menuProperty_Data")
+        
         self.actionProperty_Data = QtWidgets.QAction(MainWindow)
         self.actionProperty_Data.setObjectName("actionProperty_Data")
         self.actionPrice_Display = QtWidgets.QAction(MainWindow)
@@ -112,10 +115,6 @@ class Ui_MainWindow(object):
         self.actionPrice_Data.setObjectName("actionPrice_Data")
         self.actionProperty_Data.triggered.connect(self.to_properties)
         self.actionPrice_Data.triggered.connect(self.toPriceData)
-
-        self.actionPolscraper = QtWidgets.QAction(MainWindow)
-        self.actionPolscraper.setObjectName("actionPolscraper")
-        self.actionPolscraper.triggered.connect(self.toPolscraper)
 
         self.actionDarkSky_Weather = QtWidgets.QAction(MainWindow)
         self.actionDarkSky_Weather.setObjectName("actionDarkSky_Weather")
@@ -127,12 +126,14 @@ class Ui_MainWindow(object):
         self.actionLock.setObjectName("actionLock")
 
         self.menuMenu.addAction(self.actionExit)
+
         self.menuPrograms.addAction(self.actionNews_Scraper)
         self.menuPrograms.addAction(self.menuProperty_Data.menuAction())
+
         self.menuProperty_Data.addAction(self.actionProperty_Data)
         self.menuProperty_Data.addAction(self.actionPrice_Display)
         self.menuProperty_Data.addAction(self.actionPrice_Data)
-        self.menuPrograms.addAction(self.actionPolscraper)
+
         self.menuAPI.addAction(self.actionDarkSky_Weather)
         self.menuAPI.addAction(self.actionLocal_Information)
         self.menuComputer.addAction(self.actionLock)
@@ -140,6 +141,23 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuPrograms.menuAction())
         self.menubar.addAction(self.menuAPI.menuAction())
         self.menubar.addAction(self.menuComputer.menuAction())
+
+
+
+        
+        self.menuPolscraper = QtWidgets.QMenu(self.menuPrograms)
+        self.menuPolscraper.setObjectName("menuPolscraper")
+        self.menuPrograms.addAction(self.menuPolscraper.menuAction())
+
+        self.actionPolscraperMain = QtWidgets.QAction(MainWindow)
+        self.actionPolscraperMain.setObjectName("actionPolscraperMain")
+        self.actionPolscraperMain.triggered.connect(self.toPolscraperMain)
+        self.menuPolscraper.addAction(self.actionPolscraperMain)
+
+        self.actionPolscraperData = QtWidgets.QAction(MainWindow)
+        self.actionPolscraperData.setObjectName("actionPolscraperData")
+        self.actionPolscraperData.triggered.connect(self.toPolscraperData)
+        self.menuPolscraper.addAction(self.actionPolscraperData)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -157,7 +175,10 @@ class Ui_MainWindow(object):
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionNews_Scraper.setText(_translate("MainWindow", "News Scraper"))
         self.menuProperty_Data.setTitle(_translate("MainWindow", "Property Data"))
-        self.actionPolscraper.setText(_translate("MainWindow", "Polscraper"))
+        self.menuPolscraper.setTitle(_translate("MainWindow", "Polscraper"))
+        # self.menuPolscraper.setTitle(_translate("MainWindow, Polscraper"))
+        self.actionPolscraperMain.setText(_translate("MainWindow", "Polscraper Main"))
+        self.actionPolscraperData.setText(_translate("MainWindow", "Polscraper Data"))
         self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
         self.actionLock.setText(_translate("MainWindow", "Lock"))
@@ -177,26 +198,29 @@ class Ui_MainWindow(object):
         self.property_window.show()
         # MainWindow.close()
     def toPriceData(self):
-        print("to price data")
         self.price_data=QtWidgets.QMainWindow()
         self.ui = prop_av_table.Ui_TableWindow()
         self.ui.setupUi(self.price_data)
         MainWindow.destroy()
         self.price_data.show()
     def toPriceDisplay(self):
-        print("to price data")
         self.price_display=QtWidgets.QMainWindow()
         self.ui = prop_av_graph.Ui_GraphWindow()
         self.ui.setupUi(self.price_display)
         MainWindow.destroy()
         self.price_display.show()
-    def toPolscraper(self):
-        print("to price data")
+    def toPolscraperMain(self):
         self.polscraper=QtWidgets.QMainWindow()
         self.ui = polscraper_main.Ui_PolscraperWindow()
         self.ui.setupUi(self.polscraper)
         MainWindow.destroy()
         self.polscraper.show()
+    def toPolscraperData(self):
+        self.polscraperdata=QtWidgets.QMainWindow()
+        self.ui = polscraper_data.Ui_DataWindow()
+        self.ui.setupUi(self.polscraperdata)
+        MainWindow.destroy()
+        self.polscraperdata.show()
     
 
     def loadData(self):

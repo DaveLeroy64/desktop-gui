@@ -103,11 +103,14 @@ class Ui_DataWindow(object):
         y1 = range(0, maxY[0])
 
         x = range(1, len(categories))
+        # x = range(1, len(scores))
 
         bg1= pg.BarGraphItem(x=x, height=scores, width=0.8, brush="b")
         # self.dataGraph = pg.plot(self.centralwidget)
         self.dataGraph.clear()
         self.dataGraph.addItem(bg1)
+
+        self.graphTitle.setText(f"Top 3 topics: {categories[0]}, {categories[1]}, {categories[2]}")
         print("graph on display")
 
     def setupUi(self, DataWindow):
