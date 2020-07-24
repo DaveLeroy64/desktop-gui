@@ -66,6 +66,7 @@ class Ui_PolscraperWindow(object):
 
         if interval != "Once":
             self.scanButton.setEnabled(False)
+            self.cancelScanButton.setEnabled(True)
             # interval = int(interval[0])
             self.scan_results_label.setText(f"Scan will run on an interval of {interval}")
             self.scanButton.setEnabled(False)
@@ -78,6 +79,7 @@ class Ui_PolscraperWindow(object):
 
         else:
             self.scanButton.setEnabled(False)
+            self.cancelScanButton.setEnabled(True)
 
             self.scan_thread = ScannerThread(pages_to_scan, interval)
             self.scan_thread.scanner_signal.connect(self.scan_complete)
@@ -93,12 +95,16 @@ class Ui_PolscraperWindow(object):
         print("scan complete, results:")
         print(args)
 
-        scan_result = f"Scan complete. {int(args[0])} pages, {int(args[1])} threads and {int(args[2])} replies stored."
+        scan_result = f"Scan complete. {args[0]} pages, {args[1]} threads and {args[2]} replies stored."
 
         if "scheduled" in args[3]:
             scan_result += str(args[3])
 
+        if type(args[2]) == str and "cancelled" in args[2]:
+            scan_result = "Scan cancelled"
+
         self.scanButton.setEnabled(True)
+        self.cancelScanButton.setEnabled(False)
 
         self.reportsList.clear()
         for file in os.listdir("polscraper/reports"):
@@ -118,7 +124,7 @@ class Ui_PolscraperWindow(object):
         # self.scan_thread = threading.Thread(name="scan_thread", target=self.run_scanner)
 
         self.scan_results_label = QtWidgets.QLabel(self.centralwidget)
-        self.scan_results_label.setGeometry(QtCore.QRect(270, 270, 151, 61))
+        self.scan_results_label.setGeometry(QtCore.QRect(270, 310, 151, 61))
         self.scan_results_label.setText("Select how many pages to scan and how often (at what interval) and click SCAN to generate new report/s")
         self.scan_results_label.setWordWrap(True)
         self.scan_results_label.setAlignment(QtCore.Qt.AlignCenter)
@@ -131,7 +137,7 @@ class Ui_PolscraperWindow(object):
             self.pagesList.addItem(str(i))
 
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setGeometry(QtCore.QRect(290, 230, 111, 23))
+        self.progressBar.setGeometry(QtCore.QRect(290, 270, 111, 23))
         self.progressBar.setProperty("value", 0)
         self.progressBar.setTextVisible(False)
         self.progressBar.setObjectName("progressBar")
@@ -141,6 +147,12 @@ class Ui_PolscraperWindow(object):
         self.scanButton.setObjectName("scanButton")
         self.scanButton.clicked.connect(self.run_scanner)
         # self.scanButton.clicked.connect(self.scan_thread.start())
+
+        self.cancelScanButton = QtWidgets.QPushButton(self.centralwidget)
+        self.cancelScanButton.setGeometry(QtCore.QRect(300, 230, 91, 31))
+        self.cancelScanButton.setObjectName("cancelScanButton")
+        self.cancelScanButton.clicked.connect(self.stop_scan)
+        self.cancelScanButton.setEnabled(False)
 
         self.reportsList = QtWidgets.QListWidget(self.centralwidget)
         self.reportsList.setGeometry(QtCore.QRect(0, 50, 256, 461))
@@ -270,6 +282,7 @@ class Ui_PolscraperWindow(object):
         _translate = QtCore.QCoreApplication.translate
         PolscraperWindow.setWindowTitle(_translate("PolscraperWindow", "Polscraper Main"))
         self.scanButton.setText(_translate("PolscraperWindow", "Scan"))
+        self.cancelScanButton.setText(_translate("PolscraperWindow", "Stop Scan"))
         self.title.setText(_translate("PolscraperWindow", " Reports Stored"))
         self.intervalLabel.setText(_translate("PolscraperWindow", "Interval"))
         self.pages_label.setText(_translate("PolscraperWindow", "Pages"))
@@ -308,6 +321,13 @@ class Ui_PolscraperWindow(object):
         self.ui.setupUi(self.polscraper_data)
         PolscraperWindow.destroy()
         self.polscraper_data.show()
+
+    def stop_scan(self):
+        print("stop scan")
+        polscraper.disable_scan()
+        print("scan should now have terminated")
+
+
     def exit_program(self):
         cfm = QMessageBox()
         cfm.setWindowTitle("Close PCP?")
