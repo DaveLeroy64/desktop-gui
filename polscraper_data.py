@@ -141,7 +141,7 @@ class Ui_DataWindow(object):
         # this dict will hold all the reports as nested dicts
         data = {}
 
-        # this is a list of the reports to be used for table vertical labels
+        # this is a list of the reports to be used for table vertical labels (not sure if needed now)
         reports = []
 
         # get reports that are within the specified timeframe
@@ -151,7 +151,7 @@ class Ui_DataWindow(object):
                 print(report)
                 print("is within " + str(timeframe) + " days")
 
-                # now make each report a dictionary and put each dictionary inside the 'data' dictionary defined above
+                # open the report file and extract the dictionary from the json (which puts it inside a list)
                 with open(f"{report}") as report_json_file:
                     reportdata = json.load(report_json_file)
                     # print(reportdata)
@@ -160,9 +160,10 @@ class Ui_DataWindow(object):
 
                     # the key of each sub-dictionary (representing an individual report) to be the datetime portion of the report filename:
                     report = report[19:35]
-                    # which we then add to the list of reports in this timeframe
+                    # which we then add to the list of reports in this timeframe (now sure if needed now)
                     reports.append(report)
 
+                    # then for each report we add it as a nested dictionary to the dictionary "data"
                     data[report] = {}
                     for key, value in reportdata.items():
                         if key == "Date" or key == "Time":
@@ -212,6 +213,7 @@ class Ui_DataWindow(object):
         print(categories)
         
         self.dataTable.setRowCount(0)
+        self.dataTable.setColumnCount(len(categories))
         self.dataTable.setHorizontalHeaderLabels(categories)
 
 
@@ -232,6 +234,10 @@ class Ui_DataWindow(object):
             print(r)
             cell = QtWidgets.QTableWidgetItem(str(r))
             self.dataTable.setItem(row, col, cell)
+
+        # now do it with each of the keys and values of the nested dict (which should be r[0] I think?)
+        # the key must be the column header, which hopefully we've got from "longest"
+        # the value must be populated in the column
 
         # self.addTableRow_singleReport(self.dataTable, pair)
 
