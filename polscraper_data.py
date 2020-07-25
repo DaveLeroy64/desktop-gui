@@ -138,12 +138,83 @@ class Ui_DataWindow(object):
 
         max_time_diff = current_time - timedelta(days=timeframe)
 
+        # this dict will hold all the reports as nested dicts
+        data = {}
+
+        # this is a list of the reports to be used for table vertical labels
+        reports = []
+
         # get reports that are within the specified timeframe
         for report in glob.glob(f"polscraper\\reports\\*_pol_sentiment_analysis.json"):
             report_date = datetime.strptime(report[19:35], "%Y-%m-%d-%H-%M")
             if max_time_diff < report_date < current_time:
                 print(report)
                 print("is within " + str(timeframe) + " days")
+
+                # now make each report a dictionary and put each dictionary inside the 'data' dictionary defined above
+                with open(f"{report}") as report_json_file:
+                    reportdata = json.load(report_json_file)
+                    # print(reportdata)
+                    reportdata = reportdata[0]
+                    print(reportdata)
+
+                    # the key of each sub-dictionary (representing an individual report) to be the datetime portion of the report filename:
+                    report = report[19:35]
+                    # which we then add to the list of reports in this timeframe
+                    reports.append(report)
+
+                    data[report] = {}
+                    for key, value in reportdata.items():
+                        if key == "Date" or key == "Time":
+                            pass
+                        elif "polscraper" in key:
+                            key = key[19:35]
+                        else:
+                            data[report][key] = value
+
+                    #########This gets the TOTALS over the timeframe
+                    # for key, value in reportdata.items():
+                    #     if key == "Date" or key == "Time":
+                    #         print(str(key) + " - ignoring")
+                    #     else:
+                    #         print("checking " + str(key))
+                    #         if key not in data:
+                    #             data[key] = value
+                    #             print("new category added - " + str(key) + " with score of: " + str(value))
+                    #         else:
+                    #             print("update category - " + str(key) + " current score: " + str(value))
+                    #             data[key] += value
+                    #             print("score now: " + str(data[key]))
+
+
+        print("this is all the data")
+        print(data)
+
+        # get all categories - from longest dict in data, as it will have more categories
+        length = 0
+        longest = {'items':1}
+        for d in data.values():
+            print("sub dict:")
+            print(d)
+            if len(d) > len(longest):
+                longest = d
+            else:
+                print("shorter than longest dict")
+
+        print("=======longest====")
+        print(longest)
+
+
+        # make a list out of all the categories of the longest sub dict to display as table header labels
+        categories = list(longest.keys())
+        categories.insert(0, "Report")
+        print("categories")
+        print(categories)
+        
+        self.dataTable.setRowCount(0)
+        self.dataTable.setHorizontalHeaderLabels(categories)
+
+
 
         # what needs to happen now is the x axis of table must list all categories
         # the y axis must list all the reports
@@ -153,7 +224,28 @@ class Ui_DataWindow(object):
         # or total number of posts displayed as a line plot?
         # hmmm...
 
+        # populate vertical headers (col 1) with report titles
+        for r in data:
+            row = self.dataTable.rowCount()
+            self.dataTable.setRowCount(row+1)
+            col = 0
+            print(r)
+            cell = QtWidgets.QTableWidgetItem(str(r))
+            self.dataTable.setItem(row, col, cell)
+
+        # self.addTableRow_singleReport(self.dataTable, pair)
+
         self.populate_graph_basic_timeframe()
+
+    
+    def addTableRow_basic_timeframe(self, table, row_data):
+        row = table.rowCount()
+        table.setRowCount(row+1)
+        col = 0
+        for item in row_data: 
+            cell = QtWidgets.QTableWidgetItem(str(item))
+            table.setItem(row, col, cell)
+            col += 1
 
 
     def populate_graph_basic_timeframe(self):
