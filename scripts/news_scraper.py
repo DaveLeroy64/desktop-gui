@@ -243,10 +243,10 @@ def scanner():
 
             pic = soup.select_one(".story-1")
             storypic = pic.select_one("img")['src']
-
-            storylink = 'https://www.foxnews.com' + this_headline['href']
+            
+            storylink = this_headline['href']
             if "foxnews.com" not in storylink:
-                storylink = this_headline['href']
+                storylink = 'https://www.foxnews.com' + this_headline['href']
 
             print(storylink)
 

@@ -12,5 +12,6 @@ To do:
     - Add button to enable/disable regular news scanning
 - Add a popup to property scraper if there are more than 50 pages to confirm if you want to continue
 - ALSO just realised that the label in polscraper data display covers the "clear data" button and that's why I can't click it. Change the geometry of the label
+- Boolean "apply weighting" tickbox to polscraper data to weigh down 'topics' that are ridiculously overused
 
 - Somehow find out how to get cross-file function calls working without getting attribute error for local variables!!

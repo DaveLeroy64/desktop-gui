@@ -135,7 +135,6 @@ class Ui_DataWindow(object):
         else:
             timeframe = 1
 
-
         max_time_diff = current_time - timedelta(days=timeframe)
 
         # this dict will hold all the reports as nested dicts
@@ -148,15 +147,15 @@ class Ui_DataWindow(object):
         for report in glob.glob(f"polscraper\\reports\\*_pol_sentiment_analysis.json"):
             report_date = datetime.strptime(report[19:35], "%Y-%m-%d-%H-%M")
             if max_time_diff < report_date < current_time:
-                print(report)
-                print("is within " + str(timeframe) + " days")
+                # print(report)
+                # print("is within " + str(timeframe) + " days")
 
                 # open the report file and extract the dictionary from the json (which puts it inside a list)
                 with open(f"{report}") as report_json_file:
                     reportdata = json.load(report_json_file)
                     # print(reportdata)
                     reportdata = reportdata[0]
-                    print(reportdata)
+                    # print(reportdata)
 
                     # the key of each sub-dictionary (representing an individual report) to be the datetime portion of the report filename:
                     report = report[19:35]
@@ -173,75 +172,75 @@ class Ui_DataWindow(object):
                         else:
                             data[report][key] = value
 
-                    #########This gets the TOTALS over the timeframe
-                    # for key, value in reportdata.items():
-                    #     if key == "Date" or key == "Time":
-                    #         print(str(key) + " - ignoring")
-                    #     else:
-                    #         print("checking " + str(key))
-                    #         if key not in data:
-                    #             data[key] = value
-                    #             print("new category added - " + str(key) + " with score of: " + str(value))
-                    #         else:
-                    #             print("update category - " + str(key) + " current score: " + str(value))
-                    #             data[key] += value
-                    #             print("score now: " + str(data[key]))
 
 
-        print("this is all the data")
-        print(data)
-
-        # get all categories - from longest dict in data, as it will have more categories
+        # get all categories - from longest dict in data, as it will have more categories (ie if we add more categories later)
         length = 0
         longest = {'items':1}
         for d in data.values():
-            print("sub dict:")
-            print(d)
             if len(d) > len(longest):
                 longest = d
             else:
-                print("shorter than longest dict")
-
-        print("=======longest====")
-        print(longest)
+                print("ignore")
 
 
-        # make a list out of all the categories of the longest sub dict to display as table header labels
+
+        # make a list out of all the categories/topics of the longest sub dict to display as table header labels
         categories = list(longest.keys())
         categories.insert(0, "Report")
-        print("categories")
-        print(categories)
         
         self.dataTable.setRowCount(0)
         self.dataTable.setColumnCount(len(categories))
         self.dataTable.setHorizontalHeaderLabels(categories)
-
-
-
-        # what needs to happen now is the x axis of table must list all categories
-        # the y axis must list all the reports
-        # ....don't know what the graph will look like yet
-        # maybe the DIFFERENCE between the top topic and the next on the list
-        # displayed as a bar chart? or line plot?
-        # or total number of posts displayed as a line plot?
-        # hmmm...
 
         # populate vertical headers (col 1) with report titles
         for r in data:
             row = self.dataTable.rowCount()
             self.dataTable.setRowCount(row+1)
             col = 0
-            print(r)
+            # print(r)
             cell = QtWidgets.QTableWidgetItem(str(r))
             self.dataTable.setItem(row, col, cell)
 
-        # now do it with each of the keys and values of the nested dict (which should be r[0] I think?)
-        # the key must be the column header, which hopefully we've got from "longest"
-        # the value must be populated in the column
+        # Populating the data
 
-        # self.addTableRow_singleReport(self.dataTable, pair)
+        # set the 'cursor', if you can call it that, to the top row
+        row = 0
+
+        # iterate over the dict of nested dicts ('data')
+        for report_title, report_content in data.items():
+
+            # set the cursor to the second column (first is the report titles)
+            col = 1
+
+            # iterate over each nested dict in turn
+            for topic, freq in report_content.items():
+
+                # populate each cell with the frequency (value) of each topic/category
+                cell = QtWidgets.QTableWidgetItem(str(freq))
+                self.dataTable.setItem(row, col, cell)
+
+                # move the cursor to next column and row
+                col += 1
+
+            row += 1
 
         self.populate_graph_basic_timeframe()
+
+
+# This gets the TOTALS over the timeframe
+# for key, value in reportdata.items():
+#     if key == "Date" or key == "Time":
+#         print(str(key) + " - ignoring")
+#     else:
+#         print("checking " + str(key))
+#         if key not in data:
+#             data[key] = value
+#             print("new category added - " + str(key) + " with score of: " + str(value))
+#         else:
+#             print("update category - " + str(key) + " current score: " + str(value))
+#             data[key] += value
+#             print("score now: " + str(data[key]))
 
     
     def addTableRow_basic_timeframe(self, table, row_data):
@@ -255,10 +254,16 @@ class Ui_DataWindow(object):
 
 
     def populate_graph_basic_timeframe(self):
-        self.dataGraph.clear()
+        # self.dataGraph.clear()
         self.dataGraph = pg.PlotWidget(self.centralwidget)
         self.graphTitle.setText("Activity timeframe: " + self.a_mainTimeframeList.currentText())
         print("pop graph timeframe")
+
+        # ....don't know what the graph will look like yet
+        # maybe the DIFFERENCE between the top topic and the next on the list
+        # displayed as a bar chart? or line plot?
+        # or total number of posts displayed as a line plot?
+        # hmmm...
 
 
 
