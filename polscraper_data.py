@@ -90,8 +90,7 @@ class Ui_DataWindow(object):
             col += 1
 
     def populate_graph_single_report(self, data):
-        self.dataGraph.clear()
-        print("graph function")
+        print("pop graph single report")
         print(data)
 
         categories = []
@@ -115,6 +114,7 @@ class Ui_DataWindow(object):
 
         bg1= pg.BarGraphItem(x=x, height=scores, width=0.8, brush="b")
         # self.dataGraph = pg.plot(self.centralwidget)
+        self.dataGraph.clear()
         self.dataGraph.addItem(bg1)
 
         # self.graphTitle.setText(f"Top 3 topics: {categories[0]}, {categories[1]}, {categories[2]}") disabled for sensitivity
@@ -225,7 +225,7 @@ class Ui_DataWindow(object):
 
             row += 1
 
-        self.populate_graph_basic_timeframe()
+        self.populate_graph_basic_timeframe(data)
 
 
 # This gets the TOTALS over the timeframe
@@ -253,11 +253,63 @@ class Ui_DataWindow(object):
             col += 1
 
 
-    def populate_graph_basic_timeframe(self):
-        # self.dataGraph.clear()
-        self.dataGraph = pg.PlotWidget(self.centralwidget)
+    def populate_graph_basic_timeframe(self, data):
+        self.dataGraph.clear()
         self.graphTitle.setText("Activity timeframe: " + self.a_mainTimeframeList.currentText())
         print("pop graph timeframe")
+
+        print(data)
+        print("=======")
+
+        length = 0
+        longest = {'items':1}
+        for d in data.values():
+            if len(d) > len(longest):
+                longest = d
+                print("longest dict is:")
+                print(longest)
+            else:
+                print("ignore")
+        print("=============")
+        x_axis = list(longest.keys())
+        x_axis.remove("Pages")
+
+        print("x axis")
+        print(x_axis)
+
+        # self.dataGraph = pg.PlotWidget(self.centralwidget)
+        # self.dataGraph.clear()
+        colours = ['w','b','r','g','c','m','y','w','b','r','g','c','m','y','w','b','r','g','c','m','y','w','b','r','g','c','m','y','w','b','r','g','c','m','y']
+        col_select = 0
+
+
+
+        for category in x_axis:
+            topicfreqs = []
+            for report_title, report_content in data.items():
+                print(report_title)
+                print("+++++++")
+                for topic, freq in report_content.items():
+                    if topic == category:
+                        topicfreqs.append(freq)
+                        print(topic)
+                        print(freq)
+            # print(topicfreqs)
+            pen=pg.mkPen(color=colours[col_select])
+            # self.dataGraph.plot(x_axis, freqs) need to convert x axis to string for pyqtgraph
+            self.dataGraph.plot(range(0, len(topicfreqs)), topicfreqs, pen=pen, name=str(category))
+            print("line for")
+            print(category)
+            print(topicfreqs)
+            col_select += 1
+            print("___________")
+            self.dataGraph.addLegend()
+
+
+
+        # IDEA - ADD A LINE PLOT FOR EACH TOPIC
+        # SEE IF IT'S POSSIBLE TO ADD A TICKBOX TO SHOW/HIDE EACH TOPIC LINE
+        # SO YOU CAN CLUTTER/DECLUTTER AS REQUIRED
 
         # ....don't know what the graph will look like yet
         # maybe the DIFFERENCE between the top topic and the next on the list
