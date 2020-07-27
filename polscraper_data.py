@@ -332,7 +332,14 @@ class Ui_DataWindow(object):
     def populate_graph_posts(self,replies):
         print("pop graph posts")
         self.dataGraph.clear()
-        self.graphTitle.setText("Post count over time period")
+        total_replies = 0
+
+        for reply in replies:
+            total_replies += reply
+
+
+
+        self.graphTitle.setText(f"Activity plot - {total_replies} stored posts")
         self.dataGraph.showGrid(x=True, y=True)
         self.dataGraph.plot(range(1, len(replies)+1), replies)
         self.label.setText("Topic data table with post count plot")
