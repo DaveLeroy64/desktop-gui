@@ -39,6 +39,56 @@ class Ui_DataWindow(object):
             reversed_data[key] = value
         return reversed_data
 
+    def get_countries(self, timeframe):
+        current_time = datetime.now()
+
+        countries = []
+
+        if timeframe != "Today" and timeframe != "Select a timeframe":
+            timeframe = re.findall('\d+', timeframe)
+            timeframe = int(timeframe[0])
+
+        elif timeframe == "Select a timeframe":
+            print("user must select a timeframe")
+            self.label.setText("Select a timeframe before clicking 'Topics' or 'Posts' and to populate other menus")
+
+        else:
+            timeframe = 1
+
+        max_time_diff = current_time - timedelta(days=timeframe)
+
+        for report in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
+            
+            report_date = datetime.strptime(report[19:35], "%Y-%m-%d-%H-%M")
+            if max_time_diff < report_date < current_time:
+
+                with open(f"{report}", encoding="utf-8") as file:
+                    datafile = json.load(file)
+
+                    for thread in datafile:
+                        op_flag = thread['Flag']
+
+                        if op_flag not in countries:
+                            countries.append(op_flag)
+
+                        for reply in thread['Replies']:
+                            reply_flag = reply['Flag']
+
+                            if reply_flag not in countries:
+                                countries.append(reply_flag)
+                                
+        print(countries)
+        return countries
+
+    def fill_country_list(self):
+        timeframe = self.a_mainTimeframeList.currentText()
+        countries = self.get_countries(timeframe)
+
+        self.c_countryOptionsList.addItem("All Countries")
+        for country in countries:
+            self.c_countryOptionsList.addItem(str(country))
+
+
 
     def populate_table_single_report(self):     
         self.dataTable.clear()
@@ -144,9 +194,12 @@ class Ui_DataWindow(object):
         current_time = datetime.now()
         timeframe = self.a_mainTimeframeList.currentText()
 
-        if timeframe != "Today":
+        if timeframe != "Today" and timeframe != "Select a timeframe":
             timeframe = re.findall('\d+', timeframe)
             timeframe = int(timeframe[0])
+        elif timeframe == "Select a timeframe":
+            print("user must select a timeframe")
+            self.label.setText("Select a timeframe before clicking 'Topics' or 'Posts' and to populate other menus")
         else:
             timeframe = 1
 
@@ -311,7 +364,7 @@ class Ui_DataWindow(object):
 
             else:
                 print("PLOT THE COUNTRY POSTERS")
-                self.populate_data_countries(country_posts, "lineplot")        
+                self.populate_data_countries(country_posts, "lineplot", reports)        
 
         # if you click the "topics" button, plot topics count on graph
         else:           
@@ -398,24 +451,27 @@ class Ui_DataWindow(object):
         for reply in replies:
             total_replies += reply
 
-
-
         self.graphTitle.setText(f"Activity plot - {total_replies} stored posts")
         self.dataGraph.showGrid(x=True, y=True)
         self.dataGraph.plot(range(1, len(replies)+1), replies)
         self.label.setText("Topic data table with post count plot")
+
+
 
     def populate_data_countries(self, poster_data, *args):
         self.dataGraph.clear()
         self.dataTable.clear()
         self.dataTable.setColumnCount(2)
         self.dataTable.setRowCount(0)
+
+        timeframe = self.a_mainTimeframeList.currentText()
+
         print("pop table countries")
         print(args)
 
         poster_data = self.reverse_dict(poster_data)
-        print(poster_data)
-        print("******************")
+
+        options = self.c_countryOptionsList.currentText()
 
 
         row = 0
@@ -436,7 +492,7 @@ class Ui_DataWindow(object):
 
 
 
-        if args[0] == "barchart":
+        if args[0] == "barchart" and options == "All Countries":
             countries = []
             posts = []
 
@@ -459,9 +515,67 @@ class Ui_DataWindow(object):
             self.graphTitle.setText(f"Activity by country")
             print("graph on display")
 
-        elif args[0] == "lineplot":
+        elif args[0] == "barchart" and options != "All Countries":
+            print("display topic usage by country...ho boy")
+
+
+        elif args[0] == "lineplot" and options != "All Countries":
             print("lineplot!!!")
-            # now how to fill the list with country names...
+            print("displaying country activity by time/report")
+
+            reports = args[1]
+            posts_by_country_per_report = []
+            total_country_posts = 0
+
+            # self.dataGraph.clear()
+            self.dataTable.clear()
+            self.dataTable.setRowCount(0)
+            self.dataTable.setColumnCount(2)
+
+            for reportfile in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
+                if reportfile[19:35] in reports:
+                    country_posts_in_this_report = 0
+                    with open(f"{reportfile}", encoding="utf-8") as file:
+                        datafile = json.load(file)
+
+                        for thread in datafile:
+                            if thread['Flag'] == options:
+                                country_posts_in_this_report += 1
+                            
+                            for reply in thread['Replies']:
+                                if reply['Flag'] == options:
+                                    country_posts_in_this_report += 1
+
+                    posts_by_country_per_report.append(country_posts_in_this_report)
+                    total_country_posts += country_posts_in_this_report
+
+            row = 0
+            row = self.dataTable.rowCount()
+            for report in reports:
+                self.dataTable.setRowCount(row+1)
+                col = 0
+
+                cell = QtWidgets.QTableWidgetItem(str(report))
+                self.dataTable.setItem(row, col, cell)
+                row += 1
+
+            row = 0
+            col = 1
+            for quantity in posts_by_country_per_report:
+                cell = QtWidgets.QTableWidgetItem(str(quantity))
+                self.dataTable.setItem(row, col, cell)
+                row += 1
+
+
+
+
+            self.dataGraph.plot(range(1, len(reports)+1), posts_by_country_per_report)
+            self.dataGraph.showGrid(x=True, y=True)
+            self.graphTitle.setText(f"Activity: {options}")
+            self.tableTitle.setText(f"{options}: {total_country_posts} posts - {timeframe}")
+
+        else:
+            print("nothin")
 
 
 
@@ -550,6 +664,7 @@ class Ui_DataWindow(object):
         self.a_mainTimeframeList.setGeometry(QtCore.QRect(490, 200, 141, 22))
         self.a_mainTimeframeList.setObjectName("a_mainTimeframeList")
 
+        self.a_mainTimeframeList.addItem("Select a timeframe")
         self.a_mainTimeframeList.addItem("Today")
         self.a_mainTimeframeList.addItem("Last 2 days")
         self.a_mainTimeframeList.addItem("Last 7 days")
@@ -559,6 +674,7 @@ class Ui_DataWindow(object):
         self.a_mainTimeframeList.addItem("Last 180 days")
         self.a_mainTimeframeList.addItem("Last 365 days")
 
+        self.a_mainTimeframeList.activated.connect(self.fill_country_list)
         self.a_mainTimeframeList.activated.connect(lambda: self.label.setText(self.a_mainTimeframeList.currentText() + " selected"))
 
         self.a_showTopicsButton = QtWidgets.QPushButton(self.centralwidget)
@@ -612,14 +728,14 @@ class Ui_DataWindow(object):
         self.c_line_3.setFrameShape(QtWidgets.QFrame.VLine)
         self.c_line_3.setObjectName("c_line_3")
 
-        self.c_graphOptionsTitle = QtWidgets.QLabel(self.centralwidget)
-        self.c_graphOptionsTitle.setGeometry(QtCore.QRect(570, 280, 91, 16))
-        self.c_graphOptionsTitle.setAlignment(QtCore.Qt.AlignCenter)
-        self.c_graphOptionsTitle.setObjectName("c_graphOptionsTitle")
+        self.c_countryOptionsTitle = QtWidgets.QLabel(self.centralwidget)
+        self.c_countryOptionsTitle.setGeometry(QtCore.QRect(570, 280, 91, 16))
+        self.c_countryOptionsTitle.setAlignment(QtCore.Qt.AlignCenter)
+        self.c_countryOptionsTitle.setObjectName("c_countryOptionsTitle")
 
-        self.c_graphCategoriesList = QtWidgets.QComboBox(self.centralwidget)
-        self.c_graphCategoriesList.setGeometry(QtCore.QRect(570, 310, 91, 22))
-        self.c_graphCategoriesList.setObjectName("c_graphCategoriesList")
+        self.c_countryOptionsList = QtWidgets.QComboBox(self.centralwidget)
+        self.c_countryOptionsList.setGeometry(QtCore.QRect(570, 310, 91, 22))
+        self.c_countryOptionsList.setObjectName("c_countryOptionsList")
 
         self.c_graphTimeframeList = QtWidgets.QComboBox(self.centralwidget)
         self.c_graphTimeframeList.setGeometry(QtCore.QRect(570, 360, 91, 22))
@@ -706,7 +822,7 @@ class Ui_DataWindow(object):
         self.a_showReportButton.setText(_translate("DataWindow", "Show Report"))
         self.a_showTopicsButton.setText(_translate("DataWindow", "Topics"))
         self.a_showRepliesButton.setText(_translate("DataWindow", "Posts"))
-        self.c_graphOptionsTitle.setText(_translate("DataWindow", "Graph Options"))
+        self.c_countryOptionsTitle.setText(_translate("DataWindow", "Geo Options"))
         self.b_graphOptionsTitle_2.setText(_translate("DataWindow", "Table Options"))
         self.c_showGraphDataButton.setText(_translate("DataWindow", "Show Data"))
         self.b_showTableDataButton.setText(_translate("DataWindow", "Show Data"))
