@@ -22,6 +22,8 @@ from PyQt5.QtGui import QPainter
 
 import main, polscraper_main
 
+from polscraper import language_analyzer
+
 
 import pyqtgraph as pg
 
@@ -360,7 +362,7 @@ class Ui_DataWindow(object):
 
             if graph_type == "Bar Chart":
                 print("PLOT THE COUNTRY POSTERS")
-                self.populate_data_countries(country_posts, "barchart")
+                self.populate_data_countries(country_posts, "barchart", reports, categories)
 
             else:
                 print("PLOT THE COUNTRY POSTERS")
@@ -491,7 +493,7 @@ class Ui_DataWindow(object):
             row += 1
 
 
-
+        # display total number of posts per country
         if args[0] == "barchart" and options == "All Countries":
             countries = []
             posts = []
@@ -515,23 +517,87 @@ class Ui_DataWindow(object):
             self.graphTitle.setText(f"Activity by country")
             print("graph on display")
 
+        # display individual countries' topic counts
         elif args[0] == "barchart" and options != "All Countries":
-            print("display topic usage by country...ho boy")
+            print("display topic usage by selected country")
 
+            t = 0
+            for country, post_count in poster_data.items():
+                if country == options:
+                    t = post_count
+            
+            print(t)
 
-        elif args[0] == "lineplot" and options != "All Countries":
-            print("lineplot!!!")
-            print("displaying country activity by time/report")
-
+            # manipulate the data
             reports = args[1]
-            posts_by_country_per_report = []
-            total_country_posts = 0
+            print(reports)
 
-            # self.dataGraph.clear()
+            print(f"Scanning reports for {options}")
+            topics_by_country = language_analyzer.country_analyzer(reports, options)
+
+            print(f"{options} topic counts:")
+
+            topics_by_country = self.reverse_dict(topics_by_country)
+            print(topics_by_country)
+
+            most_discussed = nlargest(1, topics_by_country, key=topics_by_country.get)
+
+            topics = list(topics_by_country.keys())
+            topic_counts = list(topics_by_country.values())
+
+            # fill the table
             self.dataTable.clear()
             self.dataTable.setRowCount(0)
             self.dataTable.setColumnCount(2)
 
+            row = 0
+            col = 0
+            for category, category_count in topics_by_country.items():
+                self.dataTable.setRowCount(row+1)
+                col = 0
+
+                cell = QtWidgets.QTableWidgetItem(str(category))
+                self.dataTable.setItem(row, col, cell)
+                col += 1
+
+                cell = QtWidgets.QTableWidgetItem(str(category_count))
+                self.dataTable.setItem(row, col, cell)
+                row += 1
+
+
+            # create the bar chart
+            maxY = nlargest(1, topic_counts)
+            print(maxY)
+
+            y1 = range(0, maxY[0])
+
+            x = range(1, len(topics))
+
+            bg1= pg.BarGraphItem(x=x, height=topic_counts, width=0.8, brush="b")
+            self.dataGraph.clear()
+            self.dataGraph.showGrid(x=True, y=True)
+            self.dataGraph.addItem(bg1)
+
+            self.tableTitle.setText(f"{options}: most frequent subjects - {timeframe}")
+            self.graphTitle.setText(f"{t} posts stored")
+            self.label.setText(f"{timeframe}: The most common topic for posters from {options} was {most_discussed[0]}")
+
+        # display activity per individual country over a time period
+        elif args[0] == "lineplot" and options != "All Countries":
+            print("lineplot!!!")
+            print("displaying country activity by time/report")
+
+            # set up the data receiving structures
+            reports = args[1]
+            posts_by_country_per_report = []
+            total_country_posts = 0
+
+            
+            self.dataTable.clear()
+            self.dataTable.setRowCount(0)
+            self.dataTable.setColumnCount(2)
+
+            # extract the data
             for reportfile in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
                 if reportfile[19:35] in reports:
                     country_posts_in_this_report = 0
@@ -549,6 +615,7 @@ class Ui_DataWindow(object):
                     posts_by_country_per_report.append(country_posts_in_this_report)
                     total_country_posts += country_posts_in_this_report
 
+            # fill the table
             row = 0
             row = self.dataTable.rowCount()
             for report in reports:
@@ -568,7 +635,7 @@ class Ui_DataWindow(object):
 
 
 
-
+            # plot the line graph
             self.dataGraph.plot(range(1, len(reports)+1), posts_by_country_per_report)
             self.dataGraph.showGrid(x=True, y=True)
             self.graphTitle.setText(f"Activity: {options}")

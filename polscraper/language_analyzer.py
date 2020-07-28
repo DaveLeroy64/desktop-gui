@@ -6,6 +6,50 @@ from tqdm import tqdm # pylint: disable=import-error
 from .sent_terms import categories
 from heapq import nlargest
 import os
+import glob
+
+def country_analyzer(reports, country):
+    all_categories = dict(vars(categories))
+    scores = {}
+
+    for reportfile in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
+
+        if reportfile[19:35] in reports:
+            print(reportfile[19:35])
+
+            with open(f"{reportfile}", encoding="utf-8") as file:
+                data = json.load(file)
+
+                
+                for category, value in all_categories.items(): 
+
+                    if "_" not in str(category):
+                        scores[str(category)] = 0
+
+                        for thread in data:
+
+                            if len(thread['Replies']) > 0:
+                                i = 0
+                                reply = thread['Replies'][i]['Post']#is this needed?
+
+                                if thread['Flag'] == country:
+                                    op_text = thread['OP']
+
+                                    if any(word.lower() in op_text for word in value):
+                                        scores[str(category)] += 1
+
+                                for reply in thread['Replies']:
+                                    
+                                    if reply['Flag'] == country:
+                                        replytext = reply['Post']
+
+                                        if any(word.lower() in replytext for word in value):
+                                            scores[str(category)] += 1
+
+                                i += 1
+
+    return scores
+
 
 
 def analyzer(filename, numpages):
