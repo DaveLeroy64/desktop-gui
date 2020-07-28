@@ -52,7 +52,7 @@ class Ui_DataWindow(object):
 
         elif timeframe == "Select a timeframe":
             print("user must select a timeframe")
-            self.label.setText("Select a timeframe before clicking 'Topics' or 'Posts' and to populate other menus")
+            self.label.setText("Select a timeframe to enable this function")
 
         else:
             timeframe = 1
@@ -201,7 +201,7 @@ class Ui_DataWindow(object):
             timeframe = int(timeframe[0])
         elif timeframe == "Select a timeframe":
             print("user must select a timeframe")
-            self.label.setText("Select a timeframe before clicking 'Topics' or 'Posts' and to populate other menus")
+            self.label.setText("Select a timeframe to enable this function")
         else:
             timeframe = 1
 
@@ -889,7 +889,7 @@ class Ui_DataWindow(object):
         self.a_showReportButton.setText(_translate("DataWindow", "Show Report"))
         self.a_showTopicsButton.setText(_translate("DataWindow", "Topics"))
         self.a_showRepliesButton.setText(_translate("DataWindow", "Posts"))
-        self.c_countryOptionsTitle.setText(_translate("DataWindow", "Geo Options"))
+        self.c_countryOptionsTitle.setText(_translate("DataWindow", "Country Data"))
         self.b_graphOptionsTitle_2.setText(_translate("DataWindow", "Table Options"))
         self.c_showGraphDataButton.setText(_translate("DataWindow", "Show Data"))
         self.b_showTableDataButton.setText(_translate("DataWindow", "Show Data"))
