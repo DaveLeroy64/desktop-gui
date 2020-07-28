@@ -10,12 +10,16 @@ To do:
     - Add multithreading so scrapers can run at same time as using the GUI
     - Polscraper and property scraper put in separate threads. Need to do news scraper
     - Somehow find out how to get cross-file function calls working without getting attribute error for local variables!!  
+
 - News scraper
     - Make news scraper run at regular intervals. Home page display to display most recent stories in database for each outlet. 
     - Add button to enable/disable regular news scanning
+
 - Property scraper
     - Add a popup to property scraper if there are more than 50 pages to confirm if you want to continue
+
 - Polscraper
-    - The label in polscraper data display covers the "clear data" button and that's why I can't click it. Change the geometry of the label
     - Boolean "apply weighting" tickbox to polscraper data to weigh down 'topics' that are ridiculously overused
-    - Polscraper data - timeframe graph, show line plot for every topic with tickbox to show/hide each topic line as needed
+    - B and C display options - add ability to display posts by country on table and as bar chart
+    - Also add ability to show line plot of single country number of posts
+    - Remove datagraph.clear() statements as default whenever graph is populated - only when button is hit. This way you can overlay different data maybe?

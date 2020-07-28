@@ -162,14 +162,14 @@
    <widget class="QPushButton" name="a_showTimeframeButton">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>490</x>
       <y>230</y>
-      <width>101</width>
+      <width>71</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Show Timeframe</string>
+     <string>Topics</string>
     </property>
    </widget>
    <widget class="Line" name="b_line_2">
@@ -313,9 +313,9 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>450</y>
+      <y>480</y>
       <width>201</width>
-      <height>121</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="text">
@@ -339,6 +339,19 @@
     </property>
     <property name="text">
      <string>Clear Data</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="a_showTimeframeButton_2">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>230</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Posts</string>
     </property>
    </widget>
   </widget>

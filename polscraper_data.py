@@ -29,6 +29,17 @@ import pyqtgraph as pg
 
 class Ui_DataWindow(object):
 
+    def reverse_dict(self, data):        
+        # sort data in reverse order
+        data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1])}
+
+        # sort data in descending numerical order
+        reversed_data = {}
+        for key, value in reversed(data.items()):
+            reversed_data[key] = value
+        return reversed_data
+
+
     def populate_table_single_report(self):     
         self.dataTable.clear()
 
@@ -55,13 +66,15 @@ class Ui_DataWindow(object):
             self.label.setText("Table displaying: " + str(reportname)) 
             
 
-        # sort data in reverse order
-        data = {k: v for k, v in sorted(data[0].items(), key=lambda item: item[1])}
+        # # sort data in reverse order
+        # data = {k: v for k, v in sorted(data[0].items(), key=lambda item: item[1])}
 
-        # sort data in descending numerical order
-        reversed_data = {}
-        for key, value in reversed(data.items()):
-            reversed_data[key] = value
+        # # sort data in descending numerical order
+        # reversed_data = {}
+        # for key, value in reversed(data.items()):
+        #     reversed_data[key] = value
+
+        reversed_data = self.reverse_dict(data[0])
 
         col = 0
 
@@ -177,7 +190,10 @@ class Ui_DataWindow(object):
         # this is a list of the reply count per report
         reply_count = []
 
-        # get number of replies in each report
+        # this is a dict of the numposts per country
+        country_posts = {}
+
+        # get number of replies in each report and number of posts per country
         for report in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
             
             report_date = datetime.strptime(report[19:35], "%Y-%m-%d-%H-%M")
@@ -190,8 +206,38 @@ class Ui_DataWindow(object):
                     replies = 0
                     for thread in datafile:
                         # print(thread)
+                        op_flag = thread['Flag']
+                        # print("OP:")
+                        # print(op_flag)
+                        if op_flag not in country_posts:
+                            country_posts[op_flag] = 1
+                            # print("new country detected, value:")
+                            # print(country_posts[op_flag])
+
+                        else:
+                            country_posts[op_flag] += 1
+                            # print(country_posts[op_flag])
+
+
                         # print("=+=+=+")
                         replies += (len(thread['Replies']) + 1)
+
+                        for reply in thread['Replies']:
+                            reply_flag = reply['Flag']
+                            # print(reply_flag)
+                            if reply_flag not in country_posts:
+                                country_posts[reply_flag] = 1
+                                # print("new country detected, value:")
+                                # print(country_posts[reply_flag])
+
+                            else:
+                                country_posts[reply_flag] += 1
+                                # print(country_posts[reply_flag])
+
+                                
+                            # print(country_posts[reply['Flag']])
+
+
                 reply_count.append(replies)
 
 
@@ -247,14 +293,29 @@ class Ui_DataWindow(object):
                 col += 1
 
             row += 1
-        
-        # if you click the "topics" button, plot topics on graph
-        if  len(args) < 2:
-            self.populate_graph_basic_timeframe(data)
 
-        # if you click the "posts" button, plot post count on graph
-        else:            
+        
+        # if you click the "posts" button, plot post count over timeframe on graph
+        if  args[0] == "showreplies":
             self.populate_graph_posts(reply_count)
+
+        # if you enter countries in graph options show numposts from diff countries within timeframe
+        elif args[0] == "countries":
+            
+            # detect what type of graph user wants to plot, if relevant
+            graph_type = self.c_graphTimeframeList.currentText()
+
+            if graph_type == "Bar Chart":
+                print("PLOT THE COUNTRY POSTERS")
+                self.populate_data_countries(country_posts, "barchart")
+
+            else:
+                print("PLOT THE COUNTRY POSTERS")
+                self.populate_data_countries(country_posts, "lineplot")        
+
+        # if you click the "topics" button, plot topics count on graph
+        else:           
+            self.populate_graph_basic_timeframe(data) 
 
 
 # This gets the TOTALS over the timeframe
@@ -343,6 +404,68 @@ class Ui_DataWindow(object):
         self.dataGraph.showGrid(x=True, y=True)
         self.dataGraph.plot(range(1, len(replies)+1), replies)
         self.label.setText("Topic data table with post count plot")
+
+    def populate_data_countries(self, poster_data, *args):
+        self.dataGraph.clear()
+        self.dataTable.clear()
+        self.dataTable.setColumnCount(2)
+        self.dataTable.setRowCount(0)
+        print("pop table countries")
+        print(args)
+
+        poster_data = self.reverse_dict(poster_data)
+        print(poster_data)
+        print("******************")
+
+
+        row = 0
+        col = 0
+        for country, numposts in poster_data.items():
+            self.dataTable.setRowCount(row+1)
+            col = 0
+
+            cell = QtWidgets.QTableWidgetItem(str(country))
+            self.dataTable.setItem(row, col, cell)
+            col += 1
+            print(country)
+
+            cell = QtWidgets.QTableWidgetItem(str(numposts))
+            self.dataTable.setItem(row, col, cell)
+            print(numposts)
+            row += 1
+
+
+
+        if args[0] == "barchart":
+            countries = []
+            posts = []
+
+            for key, value in poster_data.items():
+                countries.append(key)
+                posts.append(int(value))
+
+
+            maxY = nlargest(1, posts)
+            print(maxY)
+
+            y1 = range(0, maxY[0])
+
+            x = range(1, len(countries))
+
+            bg1= pg.BarGraphItem(x=x, height=posts, width=0.8, brush="b")
+            self.dataGraph.clear()
+            self.dataGraph.addItem(bg1)
+
+            self.graphTitle.setText(f"Activity by country")
+            print("graph on display")
+
+        elif args[0] == "lineplot":
+            print("lineplot!!!")
+            # now how to fill the list with country names...
+
+
+
+
 
 
 
@@ -448,7 +571,7 @@ class Ui_DataWindow(object):
         self.a_showRepliesButton.setGeometry(QtCore.QRect(560, 230, 71, 23))
         self.a_showRepliesButton.setObjectName("a_showRepliesButton")
 
-        self.a_showRepliesButton.clicked.connect(functools.partial(self.populate_table_basic_timeframe, "arg"))
+        self.a_showRepliesButton.clicked.connect(functools.partial(self.populate_table_basic_timeframe, "showreplies"))
 
         #BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 
@@ -501,20 +624,25 @@ class Ui_DataWindow(object):
         self.c_graphTimeframeList = QtWidgets.QComboBox(self.centralwidget)
         self.c_graphTimeframeList.setGeometry(QtCore.QRect(570, 360, 91, 22))
         self.c_graphTimeframeList.setObjectName("c_graphTimeframeList")
+        self.c_graphTimeframeList.addItem("Bar Chart")
+        self.c_graphTimeframeList.addItem("Line Plot")
 
         self.c_showGraphDataButton = QtWidgets.QPushButton(self.centralwidget)
         self.c_showGraphDataButton.setGeometry(QtCore.QRect(570, 400, 91, 23))
         self.c_showGraphDataButton.setObjectName("c_showGraphDataButton")
+        self.c_showGraphDataButton.clicked.connect(functools.partial(self.populate_table_basic_timeframe, "countries"))
 
         #############################################################################
 
         self.clearDataButton = QtWidgets.QPushButton(self.centralwidget)
         self.clearDataButton.setGeometry(QtCore.QRect(510, 450, 101, 23))
         self.clearDataButton.setObjectName("clearDataButton")
-        self.clearDataButton.clicked.connect(lambda: print("clicked clear data"))
+        self.clearDataButton.clicked.connect(lambda: self.dataGraph.clear())
+        self.clearDataButton.clicked.connect(lambda: self.dataTable.clear())
+        self.clearDataButton.clicked.connect(lambda: self.label.setText("Displays Cleared"))
 
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(460, 450, 201, 121))
+        self.label.setGeometry(QtCore.QRect(460, 480, 201, 111))
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
