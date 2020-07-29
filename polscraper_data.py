@@ -445,6 +445,7 @@ class Ui_DataWindow(object):
         # or total number of posts displayed as a line plot?
         # hmmm...
 
+    # show line plot of total replies over time period
     def populate_graph_posts(self,replies):
         print("pop graph posts")
         self.dataGraph.clear()
@@ -459,7 +460,7 @@ class Ui_DataWindow(object):
         self.label.setText("Topic data table with post count plot")
 
 
-
+    # show data based on country of origin (poster's location)
     def populate_data_countries(self, poster_data, *args):
         self.dataGraph.clear()
         self.dataTable.clear()

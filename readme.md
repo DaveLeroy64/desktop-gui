@@ -7,9 +7,7 @@ TRIGGER WARNING: POLSCRAPER scans 4chan, a website that contains highly offensiv
 To do:
 
 - General
-    - Add multithreading so scrapers can run at same time as using the GUI
-    - Polscraper and property scraper put in separate threads. Need to do news scraper
-    - Somehow find out how to get cross-file function calls working without getting attribute error for local variables!!  
+    - Polscraper and property scraper run in separate threads. Need to do news scraper
 
 - News scraper
     - Make news scraper run at regular intervals. Home page display to display most recent stories in database for each outlet. 
@@ -20,6 +18,4 @@ To do:
 
 - Polscraper
     - Boolean "apply weighting" tickbox to polscraper data to weigh down 'topics' that are ridiculously overused
-    - B and C display options - add ability to display posts by country on table and as bar chart
-    - Also add ability to show line plot of single country number of posts
     - Remove datagraph.clear() statements as default whenever graph is populated - only when button is hit. This way you can overlay different data maybe?
