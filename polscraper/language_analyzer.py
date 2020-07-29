@@ -12,7 +12,14 @@ def country_analyzer(reports, country):
     all_categories = dict(vars(categories))
     scores = {}
 
-    for reportfile in glob.glob(f"polscraper\\reports\\*_pol_sentiment.json"):
+    for category in all_categories:
+        if "_" not in category:
+            scores[category] = 0
+
+    # print("init scores")
+    # print(scores)
+
+    for reportfile in glob.glob(f"polscraper\\reports\\*_pol_sentiment_analysis.json"):
 
         if reportfile[19:35] in reports:
             print(reportfile[19:35])
@@ -20,41 +27,29 @@ def country_analyzer(reports, country):
             with open(f"{reportfile}", encoding="utf-8") as file:
                 data = json.load(file)
 
-                
-                for category, value in all_categories.items(): 
+                countrydata = data[1]
+                # print(countrydata)
 
-                    if "_" not in str(category):
-                        scores[str(category)] = 0
-
-                        for thread in data:
-
-                            if len(thread['Replies']) > 0:
-                                i = 0
-                                reply = thread['Replies'][i]['Post']#is this needed?
-
-                                if thread['Flag'] == country:
-                                    op_text = thread['OP']
-
-                                    if any(word.lower() in op_text for word in value):
-                                        scores[str(category)] += 1
-
-                                for reply in thread['Replies']:
-                                    
-                                    if reply['Flag'] == country:
-                                        replytext = reply['Post']
-
-                                        if any(word.lower() in replytext for word in value):
-                                            scores[str(category)] += 1
-
-                                i += 1
-
+                for countrydata_object, countrydata_scores in countrydata.items():
+                    if countrydata_object == country:
+                        # print(countrydata_object)
+                        for category_object, number in countrydata_scores.items():
+                            for key, value in scores.items():
+                                if key == category_object:
+                                    scores[key] += number
+    
     return scores
+
+
+
+
 
 
 
 def analyzer(filename, numpages):
     all_categories = dict(vars(categories))
     scores = {}
+    country_scores = {}
 
     with open(f"polscraper\\reports\\{filename}") as sentfile:
         data = json.load(sentfile)
@@ -65,7 +60,7 @@ def analyzer(filename, numpages):
     print("Scanning " + str(len(data)) + " threads")
     time.sleep(2)
 
-
+    # tally up all categories and categories by country
     for category, value in tqdm(all_categories.items()): 
         if "_" not in str(category):
             scores[str(category)] = 0
@@ -78,12 +73,19 @@ def analyzer(filename, numpages):
 
                     for reply in thread['Replies']:
                         replytext = reply['Post']
+                        replyflag = reply['Flag']
+
+                        if replyflag not in country_scores.keys():
+                            country_scores[replyflag] = {}
+                        
+                        if category not in country_scores[replyflag].keys():
+                            country_scores[replyflag][category] = 0
 
                         if any(word.lower() in replytext for word in value):
                             scores[str(category)] += 1
+                            country_scores[replyflag][category] += 1
 
                     i += 1
-
 
 
     analysis_filename = datetime.datetime.now().strftime(f'{filename[:-5]}_analysis.json')
@@ -101,7 +103,14 @@ def analyzer(filename, numpages):
     for key, value in scores.items():
         d[key] = value
 
+    # print("saving:")
+    # print(new_df_data)
+    # print("******")
+    # print(country_scores)
+    time.sleep(5)
+
     new_df_data.append(d)
+    new_df_data.append(country_scores)
 
     with open(f"polscraper\\reports\\{analysis_filename}", 'w') as f:
         json.dump(new_df_data, f)

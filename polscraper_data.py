@@ -485,11 +485,11 @@ class Ui_DataWindow(object):
             cell = QtWidgets.QTableWidgetItem(str(country))
             self.dataTable.setItem(row, col, cell)
             col += 1
-            print(country)
+            # print(country)
 
             cell = QtWidgets.QTableWidgetItem(str(numposts))
             self.dataTable.setItem(row, col, cell)
-            print(numposts)
+            # print(numposts)
             row += 1
 
 
