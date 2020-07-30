@@ -23,3 +23,6 @@ To do:
 
 - Downloads manager
     - Start making this...
+
+- HomeBot integration
+    - Control computer remotely using telegram bot as authorised user.
