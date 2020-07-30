@@ -7,11 +7,12 @@ TRIGGER WARNING: POLSCRAPER scans 4chan, a website that contains highly offensiv
 To do:
 
 - General
-    - Polscraper and property scraper run in separate threads. Need to do news scraper
+    - All scrapers now run in separate threads and can run concurrently.
+    - Refresh Thread - it does sort of work but it doesn't change the status display. Fix this.
 
 - News scraper
-    - Make news scraper run at regular intervals. Home page display to display most recent stories in database for each outlet. 
-    - Add button to enable/disable regular news scanning
+    - News scraper can now be set to automatically update the news database
+    - Home page display to display most recent stories in database for each outlet. 
 
 - Property scraper
     - Add a popup to property scraper if there are more than 50 pages to confirm if you want to continue
@@ -19,3 +20,6 @@ To do:
 - Polscraper
     - Boolean "apply weighting" tickbox to polscraper data to weigh down 'topics' that are ridiculously overused
     - Remove datagraph.clear() statements as default whenever graph is populated - only when button is hit. This way you can overlay different data maybe?
+
+- Downloads manager
+    - Start making this...
