@@ -15,6 +15,7 @@ from PyQt5.QtCore import pyqtSignal, QThread
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
 import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
+from polscraper import polscraper
 
 from plyer import notification
 from datetime import datetime, timedelta
@@ -28,7 +29,7 @@ news_auto_update = False
 
 
 class RefreshThread(QThread):
-    refresh_signal = pyqtSignal("PyQt_PyObject", "PyQt_PyObject")
+    refresh_signal = pyqtSignal("PyQt_PyObject","PyQt_PyObject",)
 
     def __init__(self):
         QThread.__init__(self)
@@ -37,19 +38,19 @@ class RefreshThread(QThread):
         print("refresh thread active")
         while True:
 
-            if polscraper_main.ScannerThread.isRunning():
+            if polscraper.scanning_active:
                 print("polscraper is running")
-                self.refresh_signal.emit("polscraper", "running")
+                self.refresh_signal.emit(Ui_MainWindow, ("polscraper", "running"))
             else:
                 print("polscraper is NOT running")
-                self.refresh_signal.emit("polscraper", "not running")
+                self.refresh_signal.emit(Ui_MainWindow, ("polscraper", "not running"))
 
-            if AutoNewsThread.isRunning():
+            if news_auto_update:
                 print("news scraper is running")
-                self.refresh_signal.emit("news scraper", "running")
+                self.refresh_signal.emit(Ui_MainWindow, ("news scraper", "running"))
             else:
                 print("news scraper is NOT running")
-                self.refresh_signal.emit("news scraper", "not running")
+                self.refresh_signal.emit(Ui_MainWindow, ("news scraper", "not running"))
 
             time.sleep(10)
 
@@ -71,11 +72,11 @@ class AutoNewsThread(QThread):
         print(intervals)
         while news_auto_update == True:
 
-            print("CHECK automatic news update")
+            # print("CHECK automatic news update")
 
             current_time = datetime.now().strftime("%H:%M")
-            print(current_time)
-            print(str(current_time))
+            # print(current_time)
+            # print(str(current_time))
 
 
             if str(current_time) in intervals:
@@ -95,8 +96,20 @@ class AutoNewsThread(QThread):
 
 class Ui_MainWindow(object):
 
-    def refresh(self, *args):
-        print(args)
+    def refresh(Ui_MainWindow, info):
+        print(info)
+        if info[0] == "polscraper":
+
+            if info[1] == "not running":
+                Ui_MainWindow.polscraper_status.setText("Not Running")
+            else:
+                Ui_MainWindow.polscraper_status.setText("ACTIVE")
+
+        if info[0] == "news scraper":
+            if info[1] == "not running":
+                Ui_MainWindow.polscraper_status.setText("Not Running")
+            else:
+                Ui_MainWindow.polscraper_status.setText("ACTIVE")
 
 
 
@@ -505,12 +518,12 @@ class Ui_MainWindow(object):
 
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
-ui = Ui_PropertyWindow()
+ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 
-refresh_thread = RefreshThread()
-refresh_thread.refresh_signal.connect(Ui_MainWindow.refresh)
-refresh_thread.start()
+# refresh_thread = RefreshThread()
+# refresh_thread.refresh_signal.connect(Ui_MainWindow.refresh)
+# refresh_thread.start()
 
 # if __name__ == "__main__":
 #     print("called from other")
