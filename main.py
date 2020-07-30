@@ -11,18 +11,94 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import pyqtSignal, QThread
 from scripts import news_scraper
 from properties import Ui_PropertyWindow
 import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
 
 from plyer import notification
+from datetime import datetime, timedelta
 
 import sqlite3
 import webbrowser
-import sys
+import sys, time
 from scripts import storage
 
+news_auto_update = False
+
+
+class RefreshThread(QThread):
+    refresh_signal = pyqtSignal("PyQt_PyObject", "PyQt_PyObject")
+
+    def __init__(self):
+        QThread.__init__(self)
+
+    def run(self):
+        print("refresh thread active")
+        while True:
+
+            if polscraper_main.ScannerThread.isRunning():
+                print("polscraper is running")
+                self.refresh_signal.emit("polscraper", "running")
+            else:
+                print("polscraper is NOT running")
+                self.refresh_signal.emit("polscraper", "not running")
+
+            if AutoNewsThread.isRunning():
+                print("news scraper is running")
+                self.refresh_signal.emit("news scraper", "running")
+            else:
+                print("news scraper is NOT running")
+                self.refresh_signal.emit("news scraper", "not running")
+
+            time.sleep(10)
+
+
+class AutoNewsThread(QThread):
+    news_signal = pyqtSignal("PyQt_PyObject")
+
+
+    def __init__(self):
+        QThread.__init__(self)
+
+    def run(self):
+        print("thread active")
+        hours = ["%.2d" % i for i in range(24)]
+        intervals = []
+        for t in hours:
+            intervals.append(t + ":00")
+
+        print(intervals)
+        while news_auto_update == True:
+
+            print("CHECK automatic news update")
+
+            current_time = datetime.now().strftime("%H:%M")
+            print(current_time)
+            print(str(current_time))
+
+
+            if str(current_time) in intervals:
+                print("STARTING AUTO NEWS UPDATE")
+                news_scraper.scanner()
+                print("News update complete")
+                conn=sqlite3.connect("pcp.db")
+                cur=conn.cursor()
+                cur.execute("SELECT * FROM newsitems")
+                result = cur.fetchall()
+                self.news_signal.emit(result)
+
+            time.sleep(30)
+
+        print("news scanning ended")
+        # self.news_signal.emit(pages, threads, replies, next_scan_time)
+
 class Ui_MainWindow(object):
+
+    def refresh(self, *args):
+        print(args)
+
+
 
     def open_news_link(self, story):
         # webbrowser.open(link)
@@ -32,6 +108,45 @@ class Ui_MainWindow(object):
         # storage.browser_story(story)
         print("Opening " + story.text())
         storage.browser_story(story.text())
+
+    def news_auto_update(self):
+        print("auto update blicked")
+        global news_auto_update
+        if news_auto_update == False:
+            # self.news_auto_fetch_button.setText("Auto Update: On")
+            news_auto_update = True            
+            self.scrape_thread = AutoNewsThread()
+            self.scrape_thread.news_signal.connect(self.news_scan_complete)
+            self.scrape_thread.start()
+            self.news_auto_fetch_button.setText("Auto Update: On")
+            print("auto update ON")
+        else:
+            self.news_auto_fetch_button.setText("Auto Update: Off")
+            news_auto_update = False
+            self.scrape_thread.exit()
+            print("auto update OFF")
+
+    def loadData(self):
+        print("Begin scan")
+        news_scraper.scanner()
+        print("Scan complete")
+        conn=sqlite3.connect("pcp.db")
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM newsitems")
+        result = cur.fetchall()
+        for r in result:
+            r[3].replace("\n", "")
+            newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
+            self.news_list_view.addItem(newsitem)
+        notification.notify(title="Python Control Panel", message=f"News scraper completed. {len(result)} articles collected.")
+
+
+    def news_scan_complete(self, result):
+        for r in result:
+            r[3].replace("\n", "")
+            newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
+            self.news_list_view.addItem(newsitem)
+        notification.notify(title="Python Control Panel", message=f"News updated. {len(result)} articles collected.")
 
 
     def setupUi(self, MainWindow):
@@ -48,7 +163,7 @@ class Ui_MainWindow(object):
         # self.news_list_view.setText("Fetching news...")
 
         self.weather_text_browser = QtWidgets.QTextBrowser(self.centralwidget)
-        self.weather_text_browser.setGeometry(QtCore.QRect(550, 50, 271, 61))
+        self.weather_text_browser.setGeometry(QtCore.QRect(280, 50, 271, 61))
         self.weather_text_browser.setObjectName("weather_text_browser")
 
         self.news_label = QtWidgets.QLabel(self.centralwidget)
@@ -62,7 +177,7 @@ class Ui_MainWindow(object):
         self.news_label.setObjectName("news_label")
 
         self.weather_label = QtWidgets.QLabel(self.centralwidget)
-        self.weather_label.setGeometry(QtCore.QRect(630, 20, 111, 21))
+        self.weather_label.setGeometry(QtCore.QRect(360, 20, 111, 21))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -72,9 +187,130 @@ class Ui_MainWindow(object):
         self.weather_label.setObjectName("weather_label")
 
         self.view_news_button = QtWidgets.QPushButton(self.centralwidget)
-        self.view_news_button.setGeometry(QtCore.QRect(90, 490, 75, 23))
+        self.view_news_button.setGeometry(QtCore.QRect(20, 482, 101, 31))
         self.view_news_button.setObjectName("view_news_button")
         self.view_news_button.clicked.connect(self.loadData)
+
+        self.news_auto_fetch_button = QtWidgets.QPushButton(self.centralwidget)
+        self.news_auto_fetch_button.setGeometry(QtCore.QRect(140, 482, 101, 31))
+        self.news_auto_fetch_button.setObjectName("news_auto_fetch_button")
+        self.news_auto_fetch_button.clicked.connect(self.news_auto_update)
+
+
+        self.download_label = QtWidgets.QLabel(self.centralwidget)
+        self.download_label.setGeometry(QtCore.QRect(340, 130, 151, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.download_label.setFont(font)
+        self.download_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.download_label.setObjectName("download_label")
+
+        self.downloadSepLine = QtWidgets.QFrame(self.centralwidget)
+        self.downloadSepLine.setGeometry(QtCore.QRect(350, 150, 131, 16))
+        self.downloadSepLine.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.downloadSepLine.setFrameShape(QtWidgets.QFrame.HLine)
+        self.downloadSepLine.setObjectName("downloadSepLine")
+
+        self.downloadTable = QtWidgets.QTableWidget(self.centralwidget)
+        self.downloadTable.setGeometry(QtCore.QRect(280, 170, 271, 31))
+        self.downloadTable.setObjectName("downloadTable")
+        self.downloadTable.setColumnCount(0)
+        self.downloadTable.setRowCount(0)
+
+        self.downloadSortButton = QtWidgets.QPushButton(self.centralwidget)
+        self.downloadSortButton.setGeometry(QtCore.QRect(370, 210, 91, 31))
+        self.downloadSortButton.setObjectName("downloadSortButton")
+
+        self.downloadAutoSortBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.downloadAutoSortBox.setGeometry(QtCore.QRect(380, 250, 71, 21))
+        self.downloadAutoSortBox.setObjectName("downloadAutoSortBox")
+
+
+        self.scraper_status_title = QtWidgets.QLabel(self.centralwidget)
+        self.scraper_status_title.setGeometry(QtCore.QRect(610, 20, 151, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.scraper_status_title.setFont(font)
+        self.scraper_status_title.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.scraper_status_title.setObjectName("scraper_status_title")
+
+        self.prop_scraper_title = QtWidgets.QLabel(self.centralwidget)
+        self.prop_scraper_title.setGeometry(QtCore.QRect(570, 50, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.prop_scraper_title.setFont(font)
+        self.prop_scraper_title.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.prop_scraper_title.setObjectName("prop_scraper_title")
+
+        self.polscraper_title = QtWidgets.QLabel(self.centralwidget)
+        self.polscraper_title.setGeometry(QtCore.QRect(570, 80, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.polscraper_title.setFont(font)
+        self.polscraper_title.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.polscraper_title.setObjectName("polscraper_title")
+
+        self.news_scraper_title = QtWidgets.QLabel(self.centralwidget)
+        self.news_scraper_title.setGeometry(QtCore.QRect(570, 110, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.news_scraper_title.setFont(font)
+        self.news_scraper_title.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.news_scraper_title.setObjectName("news_scraper_title")
+
+        self.prop_scraper_status = QtWidgets.QLabel(self.centralwidget)
+        self.prop_scraper_status.setGeometry(QtCore.QRect(710, 50, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.prop_scraper_status.setFont(font)
+        self.prop_scraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.prop_scraper_status.setObjectName("prop_scraper_status")
+
+        self.polscraper_status = QtWidgets.QLabel(self.centralwidget)
+        self.polscraper_status.setGeometry(QtCore.QRect(710, 80, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.polscraper_status.setFont(font)
+        self.polscraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.polscraper_status.setObjectName("polscraper_status")
+
+        self.news_scraper_status = QtWidgets.QLabel(self.centralwidget)
+        self.news_scraper_status.setGeometry(QtCore.QRect(710, 110, 101, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.news_scraper_status.setFont(font)
+        self.news_scraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.news_scraper_status.setObjectName("news_scraper_status")
+        self.line_2 = QtWidgets.QFrame(self.centralwidget)
+        self.line_2.setGeometry(QtCore.QRect(570, 70, 211, 16))
+        self.line_2.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_2.setObjectName("line_2")
+        self.line_3 = QtWidgets.QFrame(self.centralwidget)
+        self.line_3.setGeometry(QtCore.QRect(570, 100, 211, 16))
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setObjectName("line_3")
+
+
+
+
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -170,7 +406,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Python Control Panel"))
         self.news_label.setText(_translate("MainWindow", "RECENT NEWS"))
         self.weather_label.setText(_translate("MainWindow", "WEATHER"))
-        self.view_news_button.setText(_translate("MainWindow", "View"))
+        self.download_label.setText(_translate("MainWindow", "DOWNLOAD MANAGER"))
+        self.view_news_button.setText(_translate("MainWindow", "Update"))
+        self.news_auto_fetch_button.setText(_translate("MainWindow", "Auto Update: Off"))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
         self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
         self.menuAPI.setTitle(_translate("MainWindow", "API"))
@@ -184,7 +422,18 @@ class Ui_MainWindow(object):
         self.actionPolscraperData.setText(_translate("MainWindow", "Polscraper Data"))
         self.actionDarkSky_Weather.setText(_translate("MainWindow", "DarkSky Weather"))
         self.actionLocal_Information.setText(_translate("MainWindow", "Local Information"))
-        self.actionLock.setText(_translate("MainWindow", "Lock"))
+        self.actionLock.setText(_translate("MainWindow", "Lock"))        
+        self.downloadSortButton.setText(_translate("MainWindow", "Sort Downloads"))
+        self.downloadAutoSortBox.setText(_translate("MainWindow", "Auto Sort"))
+
+        
+        self.scraper_status_title.setText(_translate("MainWindow", " SCRAPERS STATUS"))
+        self.prop_scraper_title.setText(_translate("MainWindow", "Property Scraper"))
+        self.polscraper_title.setText(_translate("MainWindow", "PolScraper"))
+        self.news_scraper_title.setText(_translate("MainWindow", "News Scraper"))
+        self.prop_scraper_status.setText(_translate("MainWindow", "Not Running"))
+        self.polscraper_status.setText(_translate("MainWindow", "Not Running"))
+        self.news_scraper_status.setText(_translate("MainWindow", "Not Running"))
 
         
         self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
@@ -243,19 +492,13 @@ class Ui_MainWindow(object):
             print(i.text())
     
 
-    def loadData(self):
-        print("Begin scan")
-        news_scraper.scanner()
-        print("Scan complete")
-        conn=sqlite3.connect("pcp.db")
-        cur=conn.cursor()
-        cur.execute("SELECT * FROM newsitems")
-        result = cur.fetchall()
-        for r in result:
-            r[3].replace("\n", "")
-            newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
-            self.news_list_view.addItem(newsitem)
-        notification.notify(title="Python Control Panel", message=f"News scraper completed. {len(result)} articles collected.")
+
+
+
+
+
+
+
         
 
 
@@ -264,6 +507,10 @@ app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
 ui = Ui_PropertyWindow()
 ui.setupUi(MainWindow)
+
+refresh_thread = RefreshThread()
+refresh_thread.refresh_signal.connect(Ui_MainWindow.refresh)
+refresh_thread.start()
 
 # if __name__ == "__main__":
 #     print("called from other")
