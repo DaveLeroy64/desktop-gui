@@ -17,6 +17,8 @@ search_time = datetime.now().strftime("%Y-%m-%d_%H%M")
 def scanner(city, radius):
     search_time = datetime.now().strftime("%Y-%m-%d_%H%M")
     city=city.lower()
+    if " " in city:
+        city = city.replace(" ", "-")
 
 
     headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0'}
@@ -142,6 +144,8 @@ def scanner(city, radius):
         #     print("Cannot calculate average BEDS")
         #     otm_avbeds = 0
 
+        if "-" in city:
+            city = city.replace("-", "_")
         print(f"Saving {len(proplist)} properties to {city.upper()} database...")
         storage.connect(city)
 

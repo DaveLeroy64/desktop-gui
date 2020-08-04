@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import pyqtSignal, QThread
-from scripts import news_scraper
+from scripts import news_scraper, dl_manager
 from properties import Ui_PropertyWindow
 import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
 from polscraper import polscraper
@@ -26,7 +26,10 @@ import sys, time
 from scripts import storage
 
 news_auto_update = False
+sort_downloads = False
 
+
+#==========THREADS==========
 
 class RefreshThread(QThread):
     refresh_signal = pyqtSignal("PyQt_PyObject","PyQt_PyObject",)
@@ -72,12 +75,7 @@ class AutoNewsThread(QThread):
         print(intervals)
         while news_auto_update == True:
 
-            # print("CHECK automatic news update")
-
             current_time = datetime.now().strftime("%H:%M")
-            # print(current_time)
-            # print(str(current_time))
-
 
             if str(current_time) in intervals:
                 print("STARTING AUTO NEWS UPDATE")
@@ -92,7 +90,27 @@ class AutoNewsThread(QThread):
             time.sleep(30)
 
         print("news scanning ended")
-        # self.news_signal.emit(pages, threads, replies, next_scan_time)
+        
+        
+class DownloadSortThread(QThread):
+    sorting_signal = pyqtSignal("PyQt_PyObject")
+
+    def __init__(self):
+        QThread.__init__(self)
+
+    def run(self):
+        print("sorting thread active")
+        
+        while sort_downloads:
+            files_sorted = dl_manager.sort()
+            self.sorting_signal.emit(files_sorted)
+
+            time.sleep(5)
+
+        print("download auto sort ended")
+
+
+#==========GUI SETUP==========
 
 class Ui_MainWindow(object):
 
@@ -112,7 +130,8 @@ class Ui_MainWindow(object):
                 Ui_MainWindow.polscraper_status.setText("ACTIVE")
 
 
-
+    #==========NEWS FUNCTIONS==========
+    
     def open_news_link(self, story):
         # webbrowser.open(link)
         storage.browser_story(story)
@@ -160,7 +179,31 @@ class Ui_MainWindow(object):
             newsitem = str(r[1]) + ":\n" + str(r[3] + "\n---------------------------------------------")
             self.news_list_view.addItem(newsitem)
         notification.notify(title="Python Control Panel", message=f"News updated. {len(result)} articles collected.")
-
+        
+    #==========DOWNLOAD SORTER==========
+    
+    def download_auto_sort(self):
+        global sort_downloads
+        if self.downloadAutoSortBox.isChecked() == True:
+            sort_downloads = True
+            print("download sorting ACTIVE")
+            self.sort_thread = DownloadSortThread()
+            self.sort_thread.sorting_signal.connect(self.download_auto_sort_ended)
+            self.sort_thread.start()
+        else:
+            sort_downloads = False
+            self.sort_thread = DownloadSortThread()
+            self.sort_thread.terminate()
+            print("download sorting deactive")
+            
+    def download_auto_sort_ended(self, files_sorted):
+        if files_sorted > 0:
+            print(f"Download sorter: {files_sorted} files sorted")
+            notification.notify(title="Python Control Panel", message=f"Download sorter: {files_sorted} files sorted")
+        else:
+            print("Download sorter: Downloads folder empty")
+        
+    #==========GUI ITEMS LAYOUT==========
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("Python Control Panel")
@@ -235,10 +278,12 @@ class Ui_MainWindow(object):
         self.downloadSortButton = QtWidgets.QPushButton(self.centralwidget)
         self.downloadSortButton.setGeometry(QtCore.QRect(370, 210, 91, 31))
         self.downloadSortButton.setObjectName("downloadSortButton")
+        self.downloadSortButton.clicked.connect(dl_manager.sort)
 
         self.downloadAutoSortBox = QtWidgets.QCheckBox(self.centralwidget)
         self.downloadAutoSortBox.setGeometry(QtCore.QRect(380, 250, 71, 21))
         self.downloadAutoSortBox.setObjectName("downloadAutoSortBox")
+        self.downloadAutoSortBox.toggled.connect(self.download_auto_sort)
 
 
         self.scraper_status_title = QtWidgets.QLabel(self.centralwidget)
@@ -452,6 +497,8 @@ class Ui_MainWindow(object):
         self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
         self.actionPrice_Display.setText(_translate("MainWindow", "Price Display"))
         self.actionPrice_Data.setText(_translate("MainWindow", "Price Data"))
+        
+    #==========NAVIGATION FUNCTIONS==========
 
     def to_properties(self, MainWindow):
         # if password = correct
