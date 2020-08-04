@@ -251,6 +251,8 @@ class Ui_MainWindow(object):
         self.news_auto_fetch_button.setGeometry(QtCore.QRect(140, 482, 101, 31))
         self.news_auto_fetch_button.setObjectName("news_auto_fetch_button")
         self.news_auto_fetch_button.clicked.connect(self.news_auto_update)
+        if news_auto_update:
+            self.news_auto_fetch_button.setText("Auto Update: On") # why doesnt this work
 
 
         self.download_label = QtWidgets.QLabel(self.centralwidget)
@@ -284,6 +286,8 @@ class Ui_MainWindow(object):
         self.downloadAutoSortBox.setGeometry(QtCore.QRect(380, 250, 71, 21))
         self.downloadAutoSortBox.setObjectName("downloadAutoSortBox")
         self.downloadAutoSortBox.toggled.connect(self.download_auto_sort)
+        if sort_downloads:
+            self.downloadAutoSortBox.setChecked(True) 
 
 
         self.scraper_status_title = QtWidgets.QLabel(self.centralwidget)
