@@ -13,7 +13,7 @@ def connect_property(city):
     conn = sqlite3.connect("./pcp.db")
     cur = conn.cursor()
     print(city)
-    cur.execute(f"CREATE TABLE IF NOT EXISTS {city} (id INTEGER PRIMARY KEY, date_listed text, price integer, address text, beds integer, bathrooms integer, reception_rooms integer, agent_name text, agent_tel text, website text, acquire_time text)")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS {city} (id INTEGER PRIMARY KEY, date_listed text, price integer, address text, beds integer, bathrooms integer, reception_rooms integer, agent_name text, agent_tel text, website text, acquire_time text, link text)")
     
     conn.commit()
     conn.close()
@@ -149,13 +149,13 @@ def check_property(city, address):
         return True
 
 
-def insert_property(city, date_listed, price, address, beds, bathrooms, reception_rooms, agent_name, agent_tel, website, acquire_time):
+def insert_property(city, date_listed, price, address, beds, bathrooms, reception_rooms, agent_name, agent_tel, website, acquire_time, link):
     city = city.replace(" ", "_")
     status = check_property(city, address)
     if status == False:
         conn=sqlite3.connect("./pcp.db")
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO {city} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (date_listed, price, address, beds, bathrooms, reception_rooms, agent_name, agent_tel, website, acquire_time))
+        cur.execute(f"INSERT INTO {city} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (date_listed, price, address, beds, bathrooms, reception_rooms, agent_name, agent_tel, website, acquire_time, link))
         conn.commit()
         conn.close()
         print("saved")

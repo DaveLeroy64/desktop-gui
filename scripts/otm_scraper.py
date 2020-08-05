@@ -98,6 +98,12 @@ def scanner(city, radius):
                 property["Agent_tel"]=item.find("span", {"class":"call"}).text #find("span").text
             except:
                 property["Agent_tel"]="None"
+            try:
+                property['Link']=item.find("a", {"class":"price"})['href']
+                property['Link']="www.onthemarket.com" + property['Link']
+            except:
+                property["Link"]="None"
+                
             property["Website"] = "OTM"
             property["Acquire_time"] = str(search_time)
             proplist.append(property)
@@ -153,7 +159,7 @@ def scanner(city, radius):
         otm_properties_existing = 0
 
         for p in proplist: # consider adding tqdm - and removing print statements in storage
-            if storage.insert_property(city, 'N/A', p['Price'], p['Address'], p['Beds'], 0, 0, p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time']) == 'new':
+            if storage.insert_property(city, 'N/A', p['Price'], p['Address'], p['Beds'], 0, 0, p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time'], p['Link']) == 'new':
                 otm_properties_saved += 1
             else:
                 otm_properties_existing += 1

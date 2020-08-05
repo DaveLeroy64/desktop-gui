@@ -224,9 +224,9 @@ class Ui_PropertyWindow(object):
         self.property_table.setToolTipDuration(0)
         self.property_table.setShowGrid(True)
         self.property_table.setRowCount(0)
-        self.property_table.setColumnCount(10)
+        self.property_table.setColumnCount(11)
         self.property_table.setObjectName("property_table")
-        self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at"])
+        self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at", "Link"])
         self.property_table.setSortingEnabled(True)
         # self.property_table.resizeColumnsToContents()
 

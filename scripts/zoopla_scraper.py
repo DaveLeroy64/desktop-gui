@@ -125,6 +125,14 @@ def scanner(city, radius):
                 property["Agent_tel"]=item.find("span", {"class":"agent_phone"}).find("span").text
             except:
                 property["Agent_tel"]="None"
+            try:
+                property['Link']=item.find("a", {"class":"listing-results-price"})['href']
+                property['Link']="www.zoopla.co.uk" + property['Link']
+            except:
+                property["Link"]="None"
+                
+                
+                
             property["Website"] = "Zoopla"
             property["Acquire_time"] = str(search_time)
 
@@ -161,7 +169,7 @@ def scanner(city, radius):
         zoo_properties_existing = 0
 
         for p in proplist: # consider adding tqdm - and removing print statements in storage
-            if storage.insert_property(city, p['Date_Listed'], p['Price'], p['Address'], p['Beds'], p['Bathrooms'], p['Reception_rooms'], p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time']) == 'new':
+            if storage.insert_property(city, p['Date_Listed'], p['Price'], p['Address'], p['Beds'], p['Bathrooms'], p['Reception_rooms'], p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time'], p['Link']) == 'new':
                 zoo_properties_saved += 1
             else:
                 zoo_properties_existing += 1
