@@ -68,10 +68,10 @@ file_destinations = {
 }
 
 def log_move(file, path):
-    print("log move")
+    # print("log move")
     with open("C:\\Users\\Ben\\Downloads\\file_move_log.txt", "a+") as logfile:
         logfile.write(current_time + ": " + str(file[23:]) + " --> " + path + "\n")
-        print("logged")
+        # print("logged")
 
 def move_file(file, filetype):
     for ftype, path in file_destinations.items():

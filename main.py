@@ -26,7 +26,7 @@ import sys, time
 from scripts import storage
 
 news_auto_update = False
-sort_downloads = False
+sort_downloads = True
 
 
 #==========THREADS==========
@@ -200,8 +200,8 @@ class Ui_MainWindow(object):
         if files_sorted > 0:
             print(f"Download sorter: {files_sorted} files sorted")
             notification.notify(title="Python Control Panel", message=f"Download sorter: {files_sorted} files sorted")
-        else:
-            print("Download sorter: Downloads folder empty")
+        # else:
+        #     print("Download sorter: Downloads folder empty")
         
     #==========GUI ITEMS LAYOUT==========
 
