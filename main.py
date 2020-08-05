@@ -66,7 +66,7 @@ class AutoNewsThread(QThread):
         QThread.__init__(self)
 
     def run(self):
-        print("thread active")
+        print("news thread active")
         hours = ["%.2d" % i for i in range(24)]
         intervals = []
         for t in hours:
@@ -252,7 +252,9 @@ class Ui_MainWindow(object):
         self.news_auto_fetch_button.setObjectName("news_auto_fetch_button")
         self.news_auto_fetch_button.clicked.connect(self.news_auto_update)
         if news_auto_update:
-            self.news_auto_fetch_button.setText("Auto Update: On") # why doesnt this work
+            self.news_auto_fetch_button.setText("Auto Update: On") 
+        else:
+            self.news_auto_fetch_button.setText("Auto Update: Off") 
 
 
         self.download_label = QtWidgets.QLabel(self.centralwidget)
@@ -470,7 +472,7 @@ class Ui_MainWindow(object):
         self.weather_label.setText(_translate("MainWindow", "WEATHER"))
         self.download_label.setText(_translate("MainWindow", "DOWNLOAD MANAGER"))
         self.view_news_button.setText(_translate("MainWindow", "Update"))
-        self.news_auto_fetch_button.setText(_translate("MainWindow", "Auto Update: Off"))
+        # self.news_auto_fetch_button.setText(_translate("MainWindow", "Auto Update: Off"))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
         self.menuPrograms.setTitle(_translate("MainWindow", "Programs"))
         self.menuAPI.setTitle(_translate("MainWindow", "API"))

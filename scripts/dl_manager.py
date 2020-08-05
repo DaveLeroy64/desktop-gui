@@ -13,8 +13,7 @@ file_types = {
     'image': ['.jpg',
                '.jpeg',
                '.png',
-               '.jpe'
-    ],
+               '.jpe'],
     'video': ['.mp4',
                '.wmv',
                '.avi',
@@ -27,7 +26,7 @@ file_types = {
                'webm'],
     'text': ['.doc',
              '.docx',
-             '.odf',
+             '.odt',
              '.txt',
              '.rtf',
              '.md',
@@ -52,7 +51,8 @@ file_types = {
     'spreadsheet': ['.xls',
                     '.xlsx',
                     '.ods',
-                    '.csv']
+                    '.csv',
+                    '.odf']
 }
 
 
@@ -76,14 +76,14 @@ def log_move(file, path):
 def move_file(file, filetype):
     for ftype, path in file_destinations.items():
         if filetype == ftype:
-            print("move " + file + " to " + path)
+            # print("move " + file + " to " + path)
             if os.path.exists(path):
                 try:
                     shutil.move(file, path)
                     log_move(file, path)
                     return "success"
                 except:
-                    print(file + " already exists in " + path)
+                    # print(file + " already exists in " + path)
                     return "failed"
             else:
                 os.mkdir(path)
@@ -92,11 +92,11 @@ def move_file(file, filetype):
                     log_move(file, path)
                     return "success"
                 except:
-                    print(file + " already exists in " + path)
+                    # print(file + " already exists in " + path)
                     return "failed"
 
 def file_type(file):
-    print("==============")
+    # print("==============")
     
     file_known = "checking"
     
@@ -104,8 +104,8 @@ def file_type(file):
         
         if any(word in file.lower() for word in value):
             file_known = "yes"
-            print(file)
-            print("Type: " + key)
+            # print(file)
+            # print("Type: " + key)
             if move_file(file, key) == "success":
                 return "moved"
                 
@@ -113,23 +113,23 @@ def file_type(file):
     if file_known != "yes":
         # check if the download is a directory
         if os.path.isdir(file):
-            print(file)
-            print("is directory")
+            # print(file)
+            # print("is directory")
             
             par1 = "("
             par2 = ")"
             # check if the directory is a movie directory (as they sometimes come in folders with the year in brackets)
             if par1 in file:
-                print("FILM FOLDER")
+                # print("FILM FOLDER")
                 year = file[file.find(par1)+1 : file.find(par2)]
-                print(year)
+                # print(year)
                 if int(year):
                     if move_file(file, "video") == "success":
                         return "moved"
                            
         else:
-            print(file)
-            print("UNKNOWN")
+            # print(file)
+            # print("UNKNOWN")
             if move_file(file, "unknown") == "success":
                 return "moved"
     return "not moved"
@@ -141,4 +141,5 @@ def sort():
         if "file type paths" not in item and "file_move_log" not in item:
             if file_type(item) == "moved": # we only want to update the count if we actually moved the file/folder
                 file_count += 1
+                print("Sorted: " + item)
     return file_count
