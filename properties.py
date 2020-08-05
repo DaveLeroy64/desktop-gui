@@ -35,9 +35,24 @@ class ScraperThread(QThread):
         self.city = city
         self.radius = radius
 
-    def run(self):        
+    def run(self):       
         zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = zoopla_scraper.scanner(self.city, self.radius)
         otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = otm_scraper.scanner(self.city, self.radius)
+        
+        # try:
+        #     zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = zoopla_scraper.scanner(self.city, self.radius)
+        #     print("zoopla scraper run")
+        # except:
+        #     zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds = 0, 0, 0, 0
+        #     print("zoopla scraper NOT RUN")
+        
+        # try:
+        #     otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = otm_scraper.scanner(self.city, self.radius)
+        #     print("OTM scraper run")
+        # except:
+        #     otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds = 0, 0, 0, 0
+        #     print("omt SCRAPER not run")
+            
         self.scraper_signal.emit(self.city, zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds, otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds)
         
 
@@ -125,13 +140,34 @@ class Ui_PropertyWindow(object):
     def scan_complete(self, city, zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds, otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds):
         global scanning_active
         scanning_active = False
-
         tot_props_saved = zoo_props_saved + otm_props_saved
         tot_props_exist = zoo_props_exist + otm_props_exist
-        av_avprice = (zoo_avprice + otm_avprice) / 2
-
-        
+        av_avprice = (zoo_avprice + otm_avprice) / 2            
         av_avbeds = (zoo_avbeds + otm_avbeds) / 2
+
+        # if otm_avprice > 0 and zoo_avprice > 0:
+        #     tot_props_saved = zoo_props_saved + otm_props_saved
+        #     tot_props_exist = zoo_props_exist + otm_props_exist
+        #     av_avprice = (zoo_avprice + otm_avprice) / 2            
+        #     av_avbeds = (zoo_avbeds + otm_avbeds) / 2
+        #     print("got both")
+            
+        # elif otm_avprice == 0 and zoo_avprice > 0:
+        #     tot_props_saved = zoo_props_saved
+        #     tot_props_exist = zoo_props_exist
+        #     av_avprice = zoo_avprice            
+        #     av_avbeds = zoo_avbeds
+        #     print("only zoopla data")
+            
+        # elif otm_avprice > 0 and zoo_avprice == 0:
+        #     tot_props_saved = otm_props_saved
+        #     tot_props_exist = otm_props_exist
+        #     av_avprice = otm_avprice            
+        #     av_avbeds = otm_avbeds
+        #     print("only otm data")
+            
+        # else:
+        #     print("FATAL PROPERTY SCRAPER ERROR - AVERAGES NOT SAVED\n"*50)
 
         print(zoo_avprice)
         print(otm_avprice)
@@ -192,6 +228,10 @@ class Ui_PropertyWindow(object):
             cell = QtWidgets.QTableWidgetItem(str(item))
             table.setItem(row, col, cell)
             col += 1
+            
+    def goto_property(self, property):
+        print("goto property" + property)
+        
 
 
 
@@ -228,6 +268,7 @@ class Ui_PropertyWindow(object):
         self.property_table.setObjectName("property_table")
         self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at", "Link"])
         self.property_table.setSortingEnabled(True)
+        self.property_table.itemDoubleClicked.connect(lambda: self.goto_property("wow"))
         # self.property_table.resizeColumnsToContents()
 
 

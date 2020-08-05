@@ -168,12 +168,12 @@ def scanner(city, radius):
         zoo_properties_saved = 0
         zoo_properties_existing = 0
 
-        for p in proplist: # consider adding tqdm - and removing print statements in storage
+        for p in tqdm(proplist): # consider adding tqdm - and removing print statements in storage
             if storage.insert_property(city, p['Date_Listed'], p['Price'], p['Address'], p['Beds'], p['Bathrooms'], p['Reception_rooms'], p['Agent_Name'], p['Agent_tel'], p['Website'], p['Acquire_time'], p['Link']) == 'new':
                 zoo_properties_saved += 1
             else:
                 zoo_properties_existing += 1
-            print(f"Saved {zoo_properties_saved} to {city} - {zoo_properties_existing} already in database")
+            # print(f"Saved {zoo_properties_saved} to {city} - {zoo_properties_existing} already in database")
 
         # it should be ok having this functionality in properties.py...it should take the avprice from all properties just scraped not just those in DB anyway
         # print("Now storing to averages database...")

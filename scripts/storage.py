@@ -131,7 +131,7 @@ def check_property(city, address):
     cur = conn.cursor()
     cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
 
-    print(f"\nENTRY CHECK - Searching tables for: {address}")
+    # print(f"\nENTRY CHECK - Searching tables for: {address}")
     for tablerow in cur.fetchall():
         table = tablerow[0]
         if table != 'newsitems' and table != 'newsarchive' and ('property_data' not in table):
@@ -139,11 +139,11 @@ def check_property(city, address):
             cur.execute(f"SELECT * FROM {table} WHERE address=?", (address,))
             result = cur.fetchall()
             if result:
-                print(f"Already exists in {table.upper()}")
+                # print(f"Already exists in {table.upper()}")
                 return True
 
     if not result:
-        print("Does not exist")
+        # print("Does not exist")
         return False
     else:
         return True
@@ -158,11 +158,11 @@ def insert_property(city, date_listed, price, address, beds, bathrooms, receptio
         cur.execute(f"INSERT INTO {city} VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (date_listed, price, address, beds, bathrooms, reception_rooms, agent_name, agent_tel, website, acquire_time, link))
         conn.commit()
         conn.close()
-        print("saved")
+        # print("saved")
         return "new"
     else:
         # print(f"Entry already exists for: {address}")
-        print("not saved")
+        # print("not saved")
         return "existing"
 
 # def store_property_data(city, avprice, datecollected, numproperties, avbeds *args):
