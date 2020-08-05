@@ -13,8 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import pyqtSignal, QThread
 from scripts import news_scraper, dl_manager
-from properties import Ui_PropertyWindow
-import prop_av_table, prop_av_graph, polscraper_main, polscraper_data
+# from properties import Ui_PropertyWindow
+import prop_av_table, prop_av_graph, polscraper_main, polscraper_data, properties
 from polscraper import polscraper
 
 from plyer import notification
@@ -43,17 +43,17 @@ class RefreshThread(QThread):
 
             if polscraper.scanning_active:
                 print("polscraper is running")
-                self.refresh_signal.emit(Ui_MainWindow, ("polscraper", "running"))
+                self.refresh_signal.emit("polscraper", "running")
             else:
                 print("polscraper is NOT running")
-                self.refresh_signal.emit(Ui_MainWindow, ("polscraper", "not running"))
+                self.refresh_signal.emit("polscraper", "not running")
 
             if news_auto_update:
                 print("news scraper is running")
-                self.refresh_signal.emit(Ui_MainWindow, ("news scraper", "running"))
+                self.refresh_signal.emit("news scraper", "running")
             else:
                 print("news scraper is NOT running")
-                self.refresh_signal.emit(Ui_MainWindow, ("news scraper", "not running"))
+                self.refresh_signal.emit("news scraper", "not running")
 
             time.sleep(10)
 
@@ -114,20 +114,20 @@ class DownloadSortThread(QThread):
 
 class Ui_MainWindow(object):
 
-    def refresh(Ui_MainWindow, info):
+    def refresh(self, info):
         print(info)
         if info[0] == "polscraper":
 
             if info[1] == "not running":
-                Ui_MainWindow.polscraper_status.setText("Not Running")
+                self.polscraper_status.setText("Not Running")
             else:
-                Ui_MainWindow.polscraper_status.setText("ACTIVE")
+                self.polscraper_status.setText("ACTIVE")
 
         if info[0] == "news scraper":
             if info[1] == "not running":
-                Ui_MainWindow.polscraper_status.setText("Not Running")
+                self.polscraper_status.setText("Not Running")
             else:
-                Ui_MainWindow.polscraper_status.setText("ACTIVE")
+                self.polscraper_status.setText("ACTIVE")
 
 
     #==========NEWS FUNCTIONS==========
@@ -341,6 +341,10 @@ class Ui_MainWindow(object):
         self.prop_scraper_status.setFont(font)
         self.prop_scraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.prop_scraper_status.setObjectName("prop_scraper_status")
+        if properties.scanning_active:
+            self.prop_scraper_status.setText("ACTIVE") 
+        else:
+            self.prop_scraper_status.setText("Not Running") 
 
         self.polscraper_status = QtWidgets.QLabel(self.centralwidget)
         self.polscraper_status.setGeometry(QtCore.QRect(710, 80, 101, 21))
@@ -350,7 +354,11 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.polscraper_status.setFont(font)
         self.polscraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.polscraper_status.setObjectName("polscraper_status")
+        self.polscraper_status.setObjectName("polscraper_status")        
+        if polscraper.scanning_active:
+            self.polscraper_status.setText("ACTIVE") 
+        else:
+            self.polscraper_status.setText("Not Running") 
 
         self.news_scraper_status = QtWidgets.QLabel(self.centralwidget)
         self.news_scraper_status.setGeometry(QtCore.QRect(710, 110, 101, 21))
@@ -360,7 +368,13 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.news_scraper_status.setFont(font)
         self.news_scraper_status.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.news_scraper_status.setObjectName("news_scraper_status")
+        self.news_scraper_status.setObjectName("news_scraper_status")        
+        if news_auto_update:
+            self.news_scraper_status.setText("ACTIVE") 
+        else:
+            self.news_scraper_status.setText("Not Running") 
+        
+        
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
         self.line_2.setGeometry(QtCore.QRect(570, 70, 211, 16))
         self.line_2.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -495,9 +509,9 @@ class Ui_MainWindow(object):
         self.prop_scraper_title.setText(_translate("MainWindow", "Property Scraper"))
         self.polscraper_title.setText(_translate("MainWindow", "PolScraper"))
         self.news_scraper_title.setText(_translate("MainWindow", "News Scraper"))
-        self.prop_scraper_status.setText(_translate("MainWindow", "Not Running"))
-        self.polscraper_status.setText(_translate("MainWindow", "Not Running"))
-        self.news_scraper_status.setText(_translate("MainWindow", "Not Running"))
+        # self.prop_scraper_status.setText(_translate("MainWindow", "Not Running"))
+        # self.polscraper_status.setText(_translate("MainWindow", "Not Running"))
+        # self.news_scraper_status.setText(_translate("MainWindow", "Not Running"))
 
         
         self.actionProperty_Data.setText(_translate("MainWindow", "Property Main"))
@@ -509,7 +523,7 @@ class Ui_MainWindow(object):
     def to_properties(self, MainWindow):
         # if password = correct
         self.property_window=QtWidgets.QMainWindow()
-        self.ui = Ui_PropertyWindow()
+        self.ui = properties.Ui_PropertyWindow()
         self.ui.setupUi(self.property_window)
         MainWindow = QtWidgets.QMainWindow()
         MainWindow.close()

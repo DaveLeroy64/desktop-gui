@@ -24,6 +24,8 @@ import sys
 import time
 from datetime import datetime
 
+scanning_active = False
+
 
 class ScraperThread(QThread):
     scraper_signal = pyqtSignal("PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", "PyQt_PyObject", )
@@ -60,6 +62,7 @@ class Ui_PropertyWindow(object):
         self.search_radius_label.setText("Search Radius: " + str(value))
 
     def interval_scan(self, intervals, cities_to_scan):
+        global scanning_active
         scanning_active = False
         """
         This function is only an example for now. Will be implemented later for regular periodic scanning.
@@ -84,6 +87,7 @@ class Ui_PropertyWindow(object):
 
 
     def scan(self):
+        global scanning_active
         self.scan_progress_bar.setProperty("value", 0)
         step_increment = 100 / int(zoopla_scraper.numpages)
         step = 0
@@ -108,6 +112,7 @@ class Ui_PropertyWindow(object):
                 self.scan_thread.scraper_signal.connect(self.scan_complete)
                 self.scan_thread.start()
                 self.scan_new_properties_button.setEnabled(False)
+                scanning_active = True
 
             except Exception as error:
                 result = error
@@ -118,6 +123,8 @@ class Ui_PropertyWindow(object):
             self.scan_results_label.setText("Please enter a radius of 1, 3, 5, 10, 15, 20, 30 or 40")
 
     def scan_complete(self, city, zoo_props_saved, zoo_props_exist, zoo_avprice, zoo_avbeds, otm_props_saved, otm_props_exist, otm_avprice, otm_avbeds):
+        global scanning_active
+        scanning_active = False
 
         tot_props_saved = zoo_props_saved + otm_props_saved
         tot_props_exist = zoo_props_exist + otm_props_exist
@@ -220,6 +227,7 @@ class Ui_PropertyWindow(object):
         self.property_table.setColumnCount(10)
         self.property_table.setObjectName("property_table")
         self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at"])
+        self.property_table.setSortingEnabled(True)
         # self.property_table.resizeColumnsToContents()
 
 
