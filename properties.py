@@ -22,6 +22,7 @@ from plyer import notification
 import main, prop_av_table, prop_av_graph
 import sys
 import time
+import webbrowser
 from datetime import datetime
 
 scanning_active = False
@@ -229,12 +230,10 @@ class Ui_PropertyWindow(object):
             table.setItem(row, col, cell)
             col += 1
             
-    def goto_property(self, property):
-        print("goto property" + property)
+    def goto_property(self, property_link):
+        print("goto property " + str(property_link))
+        webbrowser.open(property_link)
         
-
-
-
 
 
     def setupUi(self, MainWindow):
@@ -268,7 +267,7 @@ class Ui_PropertyWindow(object):
         self.property_table.setObjectName("property_table")
         self.property_table.setHorizontalHeaderLabels(["Date listed", "Price", "Address", "Bedrooms", "Bathrooms","Reception rooms","Agent name","Agent Tel","Website","Fetched at", "Link"])
         self.property_table.setSortingEnabled(True)
-        self.property_table.itemDoubleClicked.connect(lambda: self.goto_property("wow"))
+        self.property_table.itemDoubleClicked.connect(lambda: self.goto_property(self.property_table.item(self.property_table.currentRow(), 10).text()))
         # self.property_table.resizeColumnsToContents()
 
 
