@@ -8,8 +8,9 @@ Current Features:
 - Polscraper: Scrapes the board and stores all the threads/replies, with a data display that allows different data to be displayed/manipulated/compared in tables and graphs
 - Property: Scrape different property websites for properties is user-defined areas, save to database, display data and price trends/averages in tables and graph
 - News scraper: Collects headlines from different outlets and displays them. Can be set to run periodically (hourly updates)
-- Multithreading: all scrapers run in separate threads to allow multitasking
+- All scrapers run in separate threads to allow multitasking
 - Downloads manager: automatically (or on button press) sorts downloads into categories/folders, and logs all moves made to a text file
+- Oh god need make the scrapers run async ffs
 
 To do:
 
