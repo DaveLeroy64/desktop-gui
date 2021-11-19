@@ -2,6 +2,8 @@
 
 For controlling a number of mini-projects from the same place and visualising data
 
+<img src="https://i.imgur.com/MMiERer.jpg" alt="alt text" title="image Title" />
+
 
 Features:
 1. Property scraper
@@ -19,12 +21,28 @@ Features:
 - Displays average price/bedroom per area
 
 
-2. Polscraper
-    - Scrapes 4chan and stories threads/posts to JSON "reports"
-    - Scraper can be run once per click or set to run at intervals
-    - Analyses/scans each report for offensive language and common topics - WARNING: 4chan users use ***extremely*** offensive language which is searched for by this script
-    - Displays data from these reports in multiple formats (most frequent topics by nationality, time, etc)
-3. News scraper
+2. Polscraper - WARNING: 4chan users use ***extremely*** offensive language which is searched for by this application
+
+
+- Scrapes 4chan and stories threads/posts to JSON "reports"
+<img src="https://i.imgur.com/ZmBMzRH.jpg" alt="alt text" title="image Title" />
+
+
+- Scraper can be run once per click or set to run at intervals
+<img src="https://i.imgur.com/xM850V6.jpg" alt="alt text" title="image Title" />
+
+
+- Analyses/scans each report for offensive language and common topics
+<img src="https://i.imgur.com/2lmDotW.jpg" alt="alt text" title="image Title" />
+
+
+- Displays data from these reports in multiple formats (most frequent topics by nationality, time, etc)
+<img src="https://i.imgur.com/rqp9XN2.jpg" alt="alt text" title="image Title" />
+
+<img src="https://i.imgur.com/67vx7sZ.jpg" alt="alt text" title="image Title" />
+
+
+4. News scraper
     - Displays news items on main page
     - Stores to a local DB and replaces front page with newer stories
 
