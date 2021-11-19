@@ -5,14 +5,18 @@ For controlling a number of mini-projects from the same place and visualising da
 
 Features:
 1. Property scraper
-    - Gathers property listings from a chosen city, to a certain radius, and stores them in a DB
-    - Displays properties with details of bedrooms, price, agent contact, link, etc
-    - Stores average price per city and plots line chart over time
-    - Displays average price/bedroom per area
 
-
+- Gathers property listings from a chosen city, to a certain radius, and stores them in a DB
 <img src="https://i.imgur.com/tbXg7kC.jpg" alt="alt text" title="image Title" />
 
+- Displays properties with details of bedrooms, price, agent contact, link, etc
+<img src="https://i.imgur.com/R1pEEqY.jpg" alt="alt text" title="image Title" />
+
+- Stores average price per city and plots line chart over time
+<img src="https://i.imgur.com/sOwMHxF.jpg" alt="alt text" title="image Title" />
+
+
+- Displays average price/bedroom per area
 
 
 2. Polscraper
