@@ -5,13 +5,15 @@ For controlling a number of mini-projects from the same place and visualising da
 
 Features:
 1. Property scraper
-
-![Image of property main screen](https://imgur.com/tbXg7kC)
-
     - Gathers property listings from a chosen city, to a certain radius, and stores them in a DB
     - Displays properties with details of bedrooms, price, agent contact, link, etc
     - Stores average price per city and plots line chart over time
     - Displays average price/bedroom per area
+
+
+![Image of property main screen](https://imgur.com/tbXg7kC?raw=True)
+
+
 2. Polscraper
     - Scrapes 4chan and stories threads/posts to JSON "reports"
     - Scraper can be run once per click or set to run at intervals
