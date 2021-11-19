@@ -11,7 +11,7 @@ Features:
     - Displays average price/bedroom per area
 
 
-![Image of property main screen](https://imgur.com/tbXg7kC?raw=True)
+<blockquote class="imgur-embed-pub" lang="en" data-id="tbXg7kC"><a href="https://imgur.com/tbXg7kC">View post on imgur.com</a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
 
 
 2. Polscraper
